@@ -18,13 +18,14 @@ export default function SmartFocusCard({ dailyStatus, onAction }) {
     let currentFocus = 'morning';
 
     if (timeOfDay === 'morning') {
-        if (dailyStatus.win) currentFocus = 'midday'; // If morning win done, move to midday
+        if (dailyStatus.win) currentFocus = 'training'; // After win, do training
     }
-    if (timeOfDay === 'midday' || currentFocus === 'midday') {
-        if (dailyStatus.selfCare) currentFocus = 'evening'; // If self-care done, move to evening
+    if (timeOfDay === 'midday' || currentFocus === 'training') {
+        if (dailyStatus.training) currentFocus = 'midday'; // After training, self-care
+        if (dailyStatus.selfCare) currentFocus = 'evening';
     }
     if (timeOfDay === 'evening' || currentFocus === 'evening') {
-        if (dailyStatus.mood) currentFocus = 'complete'; // If mood done, all done!
+        if (dailyStatus.mood) currentFocus = 'complete';
     }
 
     // Content Definitions
@@ -36,6 +37,14 @@ export default function SmartFocusCard({ dailyStatus, onAction }) {
             actionLabel: 'Log a Small Win',
             action: () => onAction('win'),
             color: 'from-orange-400 to-pink-500'
+        },
+        training: {
+            title: 'Daily AI Training',
+            subtitle: 'Unlock your personalized module.',
+            icon: '🧠',
+            actionLabel: 'Start AI Training',
+            action: () => onAction('training'),
+            color: 'from-fuchsia-500 to-purple-600'
         },
         midday: {
             title: 'Midday Reset',

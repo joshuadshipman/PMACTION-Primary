@@ -10,9 +10,14 @@ export const AICoachModal = ({ onClose }) => {
     const messagesEndRef = useRef(null);
 
     useEffect(() => {
-        const chatInstance = createChat();
-        setChat(chatInstance);
-        setMessages([{ sender: 'bot', text: "Hello! I'm your AI wellness coach. What's on your mind today?" }]);
+        try {
+            const chatInstance = createChat();
+            setChat(chatInstance);
+            setMessages([{ sender: 'bot', text: "Hello! I'm your AI wellness coach. What's on your mind today?" }]);
+        } catch (error) {
+            console.error("Failed to initialize AI Coach:", error);
+            setMessages([{ sender: 'bot', text: "I'm currently resting or unreachable. Please try again later." }]);
+        }
     }, []);
 
     const scrollToBottom = () => {

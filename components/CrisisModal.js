@@ -1,4 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
+import StopSkill from './StopSkill';
+import TippSkill from './TippSkill';
+import { Phone, ShieldAlert } from 'lucide-react';
 
 const CRISIS_RESOURCES = [
     {
@@ -21,32 +24,83 @@ const CRISIS_RESOURCES = [
     },
 ];
 
-const CrisisModal = ({ onClose }) => (
-    <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center animate-fade-in p-4">
-        <div className="bg-white rounded-lg shadow-lg w-full max-w-sm p-6 relative">
-            <button
-                className="absolute top-2 right-2 text-gray-400 hover:text-gray-600 text-2xl"
-                onClick={onClose}
-                aria-label="Close"
-            >&times;</button>
-            <h2 className="text-xl font-bold mb-2 text-center text-red-600">Get Help Now</h2>
-            <p className="text-center text-gray-600 mb-4">If you are in crisis or need immediate help, please reach out:</p>
-            <ul className="mb-4 space-y-3">
-                {CRISIS_RESOURCES.map(resource => (
-                    <li key={resource.name} className="border rounded p-3 hover:bg-gray-50 transition-colors">
-                        <div className="font-semibold text-lg">{resource.name}</div>
-                        <div className="text-sm text-gray-600">{resource.desc}</div>
-                        <div className="mt-1">
-                            <a href={resource.link} target="_blank" rel="noopener noreferrer" className="text-indigo-600 underline font-bold">{resource.phone}</a>
+const CrisisModal = ({ onClose }) => {
+    const [view, setView] = useState('skills'); // 'skills' or 'contacts'
+
+    return (
+        <div className="fixed inset-0 bg-black bg-opacity-60 z-50 flex flex-col items-center justify-end md:justify-center animate-fade-in p-0 md:p-4">
+            <div className="bg-white rounded-t-2xl md:rounded-2xl shadow-2xl w-full max-w-lg relative max-h-[90vh] flex flex-col">
+                
+                {/* Header */}
+                <div className="flex justify-between items-center p-4 border-b">
+                    <h2 className="text-2xl font-bold flex items-center gap-2 text-gray-800">
+                        <ShieldAlert className="text-red-600" />
+                        Crisis Support
+                    </h2>
+                    <button
+                        className="w-8 h-8 flex items-center justify-center rounded-full bg-gray-100 text-gray-500 hover:bg-gray-200 hover:text-gray-800 transition"
+                        onClick={onClose}
+                        aria-label="Close"
+                    >&times;</button>
+                </div>
+
+                {/* Tabs */}
+                <div className="flex border-b">
+                    <button 
+                        onClick={() => setView('skills')}
+                        className={`flex-1 py-3 text-sm font-bold border-b-2 transition ${view === 'skills' ? 'border-blue-600 text-blue-700' : 'border-transparent text-gray-500 hover:bg-gray-50'}`}
+                    >
+                        Immediate Relief Tools
+                    </button>
+                    <button 
+                        onClick={() => setView('contacts')}
+                        className={`flex-1 py-3 text-sm font-bold border-b-2 transition flex items-center justify-center gap-2 ${view === 'contacts' ? 'border-red-600 text-red-700' : 'border-transparent text-gray-500 hover:bg-gray-50'}`}
+                    >
+                        <Phone className="w-4 h-4" /> Call/Text Now
+                    </button>
+                </div>
+
+                {/* Scrollable Content */}
+                <div className="p-4 overflow-y-auto" style={{ maxHeight: 'calc(90vh - 120px)' }}>
+                    {view === 'skills' && (
+                        <div className="space-y-6 animate-fade-in">
+                            <StopSkill />
+                            <TippSkill />
                         </div>
-                    </li>
-                ))}
-            </ul>
-            <div className="text-xs text-gray-400 text-center mt-2">
-                This app is not a substitute for immediate clinical or emergency help.
+                    )}
+
+                    {view === 'contacts' && (
+                        <div className="animate-fade-in">
+                            <div className="bg-red-50 p-4 rounded-xl border border-red-100 mb-4">
+                                <h3 className="text-red-800 font-bold flex items-center gap-2">
+                                    <ShieldAlert /> Critical Emergency
+                                </h3>
+                                <p className="text-sm text-red-700 mt-1">If you are in immediate physical danger, dial 911 immediately.</p>
+                            </div>
+                            
+                            <ul className="mb-4 space-y-3">
+                                {CRISIS_RESOURCES.map(resource => (
+                                    <li key={resource.name} className="border border-gray-200 rounded-xl p-4 hover:border-gray-300 transition-colors shadow-sm">
+                                        <div className="font-bold text-lg text-gray-800">{resource.name}</div>
+                                        <div className="text-sm text-gray-600 mb-3">{resource.desc}</div>
+                                        <a 
+                                            href={resource.link} 
+                                            target="_blank" 
+                                            rel="noopener noreferrer" 
+                                            className="inline-flex items-center gap-2 bg-gray-900 text-white px-4 py-2 rounded-lg font-bold text-sm hover:bg-gray-800"
+                                        >
+                                            <Phone className="w-4 h-4" /> {resource.phone}
+                                        </a>
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
+                    )}
+                </div>
+
             </div>
         </div>
-    </div>
-);
+    );
+};
 
 export default CrisisModal;

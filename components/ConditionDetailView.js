@@ -16,91 +16,6 @@ const TABS = [
 
 // ... (existing code)
 
-{/* Resources Tab */ }
-{
-    activeTab === 'resources' && (
-        <div className="space-y-8 animate-fade-in">
-            {/* Crisis Resources (Always visible here) */}
-            <div className="bg-red-50 border border-red-100 rounded-2xl p-6">
-                <h3 className="text-xl font-bold text-red-700 mb-4 flex items-center gap-2">
-                    🆘 Crisis Support
-                </h3>
-                <div className="grid md:grid-cols-3 gap-4">
-                    <a href="tel:988" className="flex items-center gap-3 p-4 bg-white rounded-xl shadow-sm border border-red-100 hover:shadow-md transition-all">
-                        <span className="text-2xl">📞</span>
-                        <div>
-                            <div className="font-bold text-gray-900">988</div>
-                            <div className="text-xs text-red-600">Suicide and Crisis Lifeline</div>
-                        </div>
-                    </a>
-                    <div className="flex items-center gap-3 p-4 bg-white rounded-xl shadow-sm border border-red-100">
-                        <span className="text-2xl">💬</span>
-                        <div>
-                            <div className="font-bold text-gray-900">Text HOME to 741741</div>
-                            <div className="text-xs text-red-600">Crisis Text Line</div>
-                        </div>
-                    </div>
-                    <a href="tel:911" className="flex items-center gap-3 p-4 bg-white rounded-xl shadow-sm border border-red-100 hover:shadow-md transition-all">
-                        <span className="text-2xl">🚑</span>
-                        <div>
-                            <div className="font-bold text-gray-900">911</div>
-                            <div className="text-xs text-red-600">Emergency Services</div>
-                        </div>
-                    </a>
-                </div>
-            </div>
-
-            <div>
-                <h3 className="text-xl font-bold text-gray-900 mb-4">Trusted Organizations</h3>
-                <div className="space-y-3">
-                    {condition.resources.map((res, i) => (
-                        <a key={i} href={res.url} target="_blank" rel="noopener noreferrer" className="block p-4 bg-white border hover:border-blue-500 rounded-xl transition-all hover:shadow-md flex items-center justify-between group">
-                            <span className="font-bold text-gray-800 group-hover:text-blue-600">{res.name}</span>
-                            <span className="text-gray-400 group-hover:text-blue-500">External ↗</span>
-                        </a>
-                    ))}
-                </div>
-            </div>
-
-            <div>
-                <h3 className="text-xl font-bold text-gray-900 mb-4">Frequently Asked Questions</h3>
-                <div className="space-y-4">
-                    {condition.faqs.map((faq, i) => (
-                        <div key={i} className="bg-gray-50 p-5 rounded-xl">
-                            <h4 className="font-bold text-gray-800 mb-2">❓ {faq.q}</h4>
-                            <p className="text-gray-600">{faq.a}</p>
-                        </div>
-                    ))}
-                </div>
-            </div>
-        </div>
-    )
-}
-
-{/* Related Tab */ }
-{
-    activeTab === 'related' && (
-        <div className="animate-fade-in">
-            <h3 className="text-xl font-bold text-gray-900 mb-6">Often Co-Occurs With</h3>
-            <div className="grid md:grid-cols-2 gap-4">
-                {condition.related_ids?.map((id, i) => (
-                    <div key={i} className="p-6 bg-gray-50 rounded-2xl border border-gray-100 flex items-center gap-4">
-                        <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center text-xl shadow-sm">🔗</div>
-                        <div>
-                            <h4 className="font-bold text-gray-900 capitalize">{id}</h4>
-                            <button className="text-sm text-blue-600 font-medium hover:underline mt-1">Learn more</button>
-                        </div>
-                    </div>
-                ))}
-            </div>
-            <div className="mt-8 bg-blue-50 p-6 rounded-2xl">
-                <h4 className="font-bold text-blue-900 mb-2">Why This Matters</h4>
-                <p className="text-blue-800">Treating one condition may not address all symptoms. Comprehensive evaluation is important as symptoms can overlap (e.g., Anxiety vs. ADHD inattention).</p>
-            </div>
-        </div>
-    )
-}
-
 const AGE_GROUPS = [
     { id: 'children', label: 'Children (6-12)' },
     { id: 'teens', label: 'Teens (13-25)' },
@@ -276,7 +191,7 @@ export default function ConditionDetailView({ condition }) {
                                 <p className="text-sm font-bold text-blue-900 mb-1">Important Notes:</p>
                                 <ul className="list-disc list-inside text-sm text-blue-800">
                                     {condition.treatment.medication.notes.map((n, i) => <li key={i}>{n}</li>)}
-                                ul>
+                                </ul>
                             </div>
                         </div>
 

@@ -25,14 +25,20 @@ export default function ContentRecommendationCard() {
                 const recentMoods = wins.filter(w => w.label === 'Mood Check-in').slice(0, 5);
                 const interests = userProfile?.interests || ['General Wellness'];
 
-                // Dynamically import to avoid circular dependency issues if any
-                const { generateContentRecommendations } = require('../lib/services/geminiService');
-
-                const recs = await generateContentRecommendations({
-                    moods: recentMoods,
-                    recentWins: wins.slice(0, 3),
-                    interests
+                // Call the API Route instead of direct service
+                const response = await fetch('/api/generate-recommendations', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        moods: recentMoods,
+                        recentWins: wins.slice(0, 3),
+                        interests
+                    })
                 });
+
+                if (!response.ok) throw new Error('API Failed');
+
+                const recs = await response.json();
 
                 if (recs) {
                     // Match Challenge ID
@@ -56,6 +62,7 @@ export default function ContentRecommendationCard() {
                 }
 
             } catch (err) {
+                console.error("Recommendation Error:", err);
                 // Fallback: Random
                 if (BLOG_POSTS.length > 0) setArticle(BLOG_POSTS[Math.floor(Math.random() * BLOG_POSTS.length)]);
                 if (CHALLENGES.length > 0) setChallenge(CHALLENGES[Math.floor(Math.random() * CHALLENGES.length)]);

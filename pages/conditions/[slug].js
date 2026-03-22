@@ -4,7 +4,6 @@ import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { CONDITIONS } from '../../lib/conditionsData';
 import ConditionDetailView from '../../components/ConditionDetailView';
-import Layout from '../../components/Layout'; // Assuming a Layout component exists or you wrap it manually
 
 const ConditionPage = () => {
     const router = useRouter();

@@ -15,11 +15,16 @@ import DailyQuote from '../components/DailyQuote';
 import SmartInsight from '../components/SmartInsight';
 import TimeDurationCards from '../components/TimeDurationCards';
 import ContentRecommendationCard from '../components/ContentRecommendationCard';
+import DailyTrainingCard from '../components/DailyTrainingCard';
 import { AICoachModal } from '../components/AICoachModal';
 // New Interactive Modals
 import { GuidedExerciseModal } from '../components/GuidedExerciseModal';
 import FocusTimerModal from '../components/FocusTimerModal';
 import Confetti from 'react-confetti';
+import VisualTimer from '../components/VisualTimer';
+import ErrorBoundary from '../components/ErrorBoundary';
+import FeedbackModal from '../components/FeedbackModal';
+import { MessageSquarePlus } from 'lucide-react';
 
 const DashboardPage = () => {
     const router = useRouter();
@@ -35,6 +40,7 @@ const DashboardPage = () => {
     const [isSelfCareHubOpen, setIsSelfCareHubOpen] = useState(false);
     const [isCrisisModalOpen, setIsCrisisModalOpen] = useState(false);
     const [isAICoachOpen, setIsAICoachOpen] = useState(false);
+    const [isFeedbackOpen, setIsFeedbackOpen] = useState(false);
 
     // Quick Action States
     const [isExerciseOpen, setIsExerciseOpen] = useState(false);
@@ -183,6 +189,16 @@ const DashboardPage = () => {
         setIsSelfCareHubOpen(false);
     };
 
+    const handleTrainingComplete = async (trainingData) => {
+        await handleAddWin({
+            type: 'activity',
+            label: 'Daily AI Training',
+            icon: '🧠',
+            xp: 50,
+            benefit: `Completed: ${trainingData?.title || 'Personalized Module'}`
+        });
+    };
+
     // Calculate progress (Visual only if no real XP logic in frontend yet)
     // We used profile.total_points for raw XP. 
     // Let's assume 100 XP per level for visual bar if not defined logic.
@@ -224,6 +240,7 @@ const DashboardPage = () => {
             {isAICoachOpen && <AICoachModal onClose={() => setIsAICoachOpen(false)} />}
             {isExerciseOpen && <GuidedExerciseModal exerciseTitle={selectedExercise?.name} onClose={() => setIsExerciseOpen(false)} />}
             {isFocusTimerOpen && <FocusTimerModal onClose={() => setIsFocusTimerOpen(false)} onComplete={handleFocusComplete} />}
+            {isFeedbackOpen && <FeedbackModal onClose={() => setIsFeedbackOpen(false)} />}
             {showConfetti && <Confetti recycle={false} numberOfPieces={200} />}
 
             {/* Navigation (Liquid Glass) */}
@@ -242,11 +259,14 @@ const DashboardPage = () => {
                             </div>
                             <button
                                 onClick={() => setIsFocusMode(!isFocusMode)}
-                                className={`flex items-center gap-2 px-4 py-2 rounded-full font-medium transition-all transform hover:scale-105 shadow-sm border ${isFocusMode ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'}`}
+                                className={`hidden md:flex items-center gap-2 px-4 py-2 rounded-full font-medium transition-all transform hover:scale-105 shadow-sm border ${isFocusMode ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'}`}
                             >
                                 {isFocusMode ? (<span>🟢 Focus ON</span>) : (<span>⚪ Focus OFF</span>)}
                             </button>
-                            <button onClick={handleLogout} className="text-sm font-medium text-gray-500 hover:text-gray-700 ml-4">Logout</button>
+                            <button onClick={() => setIsFeedbackOpen(true)} className="flex items-center gap-1 text-sm font-medium text-gray-500 hover:text-blue-600 ml-4 transition">
+                                <MessageSquarePlus className="w-4 h-4" /> Feedback
+                            </button>
+                            <button onClick={handleLogout} className="text-sm font-medium text-gray-500 hover:text-red-600 ml-4 transition">Logout</button>
                         </div>
                     </div>
                 </div>
@@ -257,29 +277,28 @@ const DashboardPage = () => {
                     <DailyQuote />
 
                     <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-12">
-                        {/* Action Buttons */}
-                        <motion.button
-                            whileHover={{ scale: 1.05 }}
-                            onClick={() => router.push('/challenges')}
-                            className="p-4 glass-panel rounded-2xl flex flex-col items-center justify-center text-center min-h-[120px] bg-white/40"
-                        >
-                            <span className="text-4xl mb-2">🚀</span>
-                            <span className="font-bold text-lg text-indigo-900">Challenges</span>
-                        </motion.button>
-
-                        <button onClick={() => { setModalTab('mood'); setIsWinModalOpen(true); }} className="p-4 bg-white border-2 border-fuchsia-500 rounded-2xl shadow-lg flex flex-col items-center justify-center min-h-[120px]">
+                        {/* 1. Mood Check-In */}
+                        <button onClick={() => { setModalTab('mood'); setIsWinModalOpen(true); }} className="p-4 bg-white border-2 border-fuchsia-500 rounded-2xl shadow-lg flex flex-col items-center justify-center min-h-[120px] hover:scale-105 transition-transform">
                             <span className="text-4xl mb-2">🎭</span>
-                            <span className="font-bold text-lg text-fuchsia-700">Check Mood</span>
+                            <span className="font-bold text-lg text-fuchsia-700">Mood Check-In</span>
                         </button>
 
-                        <button onClick={() => setIsSelfCareHubOpen(true)} className="p-4 bg-white border-2 border-purple-500 rounded-2xl shadow-lg flex flex-col items-center justify-center min-h-[120px]">
+                        {/* 2. PMA Action (Journal/Topic/Habit) */}
+                        <button onClick={() => { setModalTab('journal'); setIsWinModalOpen(true); }} className="p-4 bg-white border-2 border-orange-500 rounded-2xl shadow-lg flex flex-col items-center justify-center min-h-[120px] hover:scale-105 transition-transform">
+                            <span className="text-4xl mb-2">⚡</span>
+                            <span className="font-bold text-lg text-orange-700">PMA Action</span>
+                        </button>
+
+                        {/* 3. Self-Care */}
+                        <button onClick={() => setIsSelfCareHubOpen(true)} className="p-4 bg-white border-2 border-purple-500 rounded-2xl shadow-lg flex flex-col items-center justify-center min-h-[120px] hover:scale-105 transition-transform">
                             <span className="text-4xl mb-2">🧘</span>
                             <span className="font-bold text-lg text-purple-700">Self-Care</span>
                         </button>
 
-                        <button onClick={() => router.push('/advocacy')} className="p-4 bg-indigo-50 border-2 border-indigo-500 rounded-2xl shadow-lg flex flex-col items-center justify-center min-h-[120px]">
-                            <span className="text-4xl mb-2">📰</span>
-                            <span className="font-bold text-lg text-indigo-700">Advocacy</span>
+                        {/* 4. Resources / HELP (Advocacy for now, based on current routing, or library if we want to change it) */}
+                        <button onClick={() => router.push('/library')} className="p-4 bg-white border-2 border-indigo-500 rounded-2xl shadow-lg flex flex-col items-center justify-center min-h-[120px] hover:scale-105 transition-transform">
+                            <span className="text-4xl mb-2">🆘</span>
+                            <span className="font-bold text-lg text-indigo-700">Resources / HELP</span>
                         </button>
                     </div>
 
@@ -317,9 +336,18 @@ const DashboardPage = () => {
                                 </div>
                             </div>
 
-                            <ContentRecommendationCard />
+                            <div id="daily-training-section">
+                                <ErrorBoundary>
+                                    <DailyTrainingCard onComplete={handleTrainingComplete} />
+                                </ErrorBoundary>
+                            </div>
 
-                            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+                            <ErrorBoundary>
+                                <ContentRecommendationCard />
+                            </ErrorBoundary>
+
+                            <ErrorBoundary>
+                                <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
                                 <h2 className="text-xl font-bold text-gray-800 mb-4">Recent Victories</h2>
                                 <div className="space-y-3">
                                     {wins.length > 0 ? wins.slice(0, 3).map((win, idx) => (
@@ -335,17 +363,32 @@ const DashboardPage = () => {
                                         <p className="text-gray-400 text-center py-4">No wins yet today. Go get one!</p>
                                     )}
                                 </div>
-                            </div>
+                                </div>
+                            </ErrorBoundary>
 
-                            <SmartInsight onOpenCoach={() => setIsAICoachOpen(true)} />
+                            <ErrorBoundary>
+                                <SmartInsight onOpenCoach={() => setIsAICoachOpen(true)} />
+                            </ErrorBoundary>
                         </div>
 
                         <div className="space-y-6">
-                            <TimeDurationCards onAction={handleTimeCardAction} />
+                            <ErrorBoundary>
+                                <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 flex flex-col items-center relative overflow-hidden">
+                                    <h2 className="text-xl font-bold text-gray-800 mb-1 w-full text-left">Quick Timer</h2>
+                                    <p className="text-sm text-gray-500 mb-4 w-full text-left">Keep track of time</p>
+                                    <VisualTimer defaultDurationMinutes={5} />
+                                </div>
+                            </ErrorBoundary>
 
-                            <SmartFocusCard
+                            <ErrorBoundary>
+                                <TimeDurationCards onAction={handleTimeCardAction} />
+                            </ErrorBoundary>
+
+                            <ErrorBoundary>
+                                <SmartFocusCard
                                 dailyStatus={{
-                                    win: wins.length > 0,
+                                    win: wins.some(w => w.type !== 'activity' || w.label !== 'Daily AI Training'),
+                                    training: wins.some(w => w.label === 'Daily AI Training'),
                                     mood: wins.some(w => w.label === 'Mood Check-in'),
                                     selfCare: wins.some(w => w.win_type === 'self_care')
                                 }}
@@ -353,11 +396,17 @@ const DashboardPage = () => {
                                     if (action === 'win') setIsWinModalOpen(true);
                                     if (action === 'mood') { setModalTab('mood'); setIsWinModalOpen(true); }
                                     if (action === 'self_care') setIsSelfCareHubOpen(true);
+                                    if (action === 'training') {
+                                        document.getElementById('daily-training-section')?.scrollIntoView({ behavior: 'smooth' });
+                                    }
                                 }}
-                            />
+                                />
+                            </ErrorBoundary>
 
                             {/* ACTIVE CHALLENGE CARD (Using Real Data) */}
-                            <ActiveChallengeCard challenge={activeChallengeData} />
+                            <ErrorBoundary>
+                                <ActiveChallengeCard challenge={activeChallengeData} />
+                            </ErrorBoundary>
                         </div>
                     </div>
 

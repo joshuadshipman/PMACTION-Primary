@@ -43,6 +43,10 @@ export default function AddWinModal({ isOpen, onClose, initialTab = WIN_TYPES.AC
 
     // Mood State
     const [selectedPrimaryEmotion, setSelectedPrimaryEmotion] = useState(null);
+    const [useCBT, setUseCBT] = useState(false);
+    const [cbtCatch, setCbtCatch] = useState('');
+    const [cbtCheck, setCbtCheck] = useState('');
+    const [cbtChange, setCbtChange] = useState('');
 
     // Self-Care State
     const [selectedSelfCare, setSelectedSelfCare] = useState(null);
@@ -116,8 +120,13 @@ export default function AddWinModal({ isOpen, onClose, initialTab = WIN_TYPES.AC
 
                 switch (activeTab) {
                     case WIN_TYPES.MOOD:
-                        if (!journalText.trim()) return;
-                        winData = { ...winData, content: journalText, xp: 15, label: 'Mood Check-in', icon: '🎭' };
+                        if (!journalText.trim() && !useCBT) return;
+                        let finalContent = journalText;
+                        if (useCBT) {
+                            const cbtText = `\n\nCBT Reflection:\nCatch it: ${cbtCatch}\nCheck it: ${cbtCheck}\nChange it: ${cbtChange}`;
+                            finalContent = finalContent ? finalContent + cbtText : cbtText;
+                        }
+                        winData = { ...winData, content: finalContent, xp: useCBT ? 30 : 15, label: 'Mood Check-in', icon: '🎭' };
                         break;
                     case WIN_TYPES.JOURNAL:
                         if (!journalText.trim()) return;
@@ -159,6 +168,10 @@ export default function AddWinModal({ isOpen, onClose, initialTab = WIN_TYPES.AC
         setFilterTime('');
         setFilterCost('');
         setSelectedPrimaryEmotion(null);
+        setUseCBT(false);
+        setCbtCatch('');
+        setCbtCheck('');
+        setCbtChange('');
         setActiveTab(WIN_TYPES.ACTIVITY);
         setShowSuccess(false);
     };
@@ -169,6 +182,10 @@ export default function AddWinModal({ isOpen, onClose, initialTab = WIN_TYPES.AC
         setGratitudeList(['', '', '']);
         setSelectedSelfCare(null);
         setSelectedPrimaryEmotion(null);
+        setUseCBT(false);
+        setCbtCatch('');
+        setCbtCheck('');
+        setCbtChange('');
         setShowSuccess(false);
     };
 
@@ -343,6 +360,34 @@ export default function AddWinModal({ isOpen, onClose, initialTab = WIN_TYPES.AC
                                 placeholder="Elaborate on your feelings (optional)..."
                                 className="w-full h-24 p-4 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none resize-none text-gray-700 text-sm"
                             />
+
+                            {/* CBT Integration */}
+                            {['Sadness', 'Anger', 'Fear', 'Disgust'].includes(selectedPrimaryEmotion) && (
+                                <div className="mt-4 border-t border-gray-100 pt-4">
+                                    <label className="flex items-center gap-2 cursor-pointer mb-4">
+                                        <input type="checkbox" checked={useCBT} onChange={(e) => setUseCBT(e.target.checked)} className="rounded text-blue-600 focus:ring-blue-500 w-4 h-4" />
+                                        <span className="text-sm font-bold text-gray-800">Process this with CBT (Catch, Check, Change)</span>
+                                        <span className="ml-auto text-xs font-bold text-green-500 bg-green-50 px-2 py-1 rounded-full">+15 XP</span>
+                                    </label>
+                                    
+                                    {useCBT && (
+                                        <div className="space-y-3 animate-fade-in-up">
+                                            <div>
+                                                <label className="text-xs font-bold text-gray-700 block mb-1">Catch It (What thought triggered this?)</label>
+                                                <textarea value={cbtCatch} onChange={e => setCbtCatch(e.target.value)} className="w-full h-16 p-3 border border-gray-200 focus:border-blue-400 rounded-lg text-sm outline-none resize-none" placeholder="e.g. 'I messed up and everyone hates me.'" />
+                                            </div>
+                                            <div>
+                                                <label className="text-xs font-bold text-gray-700 block mb-1">Check It (Is this 100% true? Evidence?)</label>
+                                                <textarea value={cbtCheck} onChange={e => setCbtCheck(e.target.value)} className="w-full h-16 p-3 border border-gray-200 focus:border-blue-400 rounded-lg text-sm outline-none resize-none" placeholder="e.g. 'I made a mistake, but my friend said it was okay.'" />
+                                            </div>
+                                            <div>
+                                                <label className="text-xs font-bold text-gray-700 block mb-1">Change It (What is a more balanced thought?)</label>
+                                                <textarea value={cbtChange} onChange={e => setCbtChange(e.target.value)} className="w-full h-16 p-3 border border-gray-200 focus:border-blue-400 rounded-lg text-sm outline-none resize-none" placeholder="e.g. 'Making mistakes is human, I am still learning.'" />
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+                            )}
 
                             {/* Hashtags - Two Rows */}
                             <div className="space-y-2">
