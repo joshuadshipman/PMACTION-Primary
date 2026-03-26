@@ -2,7 +2,20 @@ import React, { useState, useEffect } from 'react';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { useApp } from '../../lib/context';
-import { supabase } from '../../lib/supabaseClient';
+import { auth, db } from '../../lib/firebaseClient';
+import { 
+    collection, 
+    query, 
+    where, 
+    getDocs, 
+    getDoc, 
+    doc, 
+    setDoc, 
+    updateDoc, 
+    orderBy, 
+    limit, 
+    serverTimestamp 
+} from 'firebase/firestore';
 
 export default function QuizPage() {
     const router = useRouter();
@@ -41,33 +54,37 @@ export default function QuizPage() {
         if (!user || !assessment) return;
 
         try {
+            const totalScore = calculateTotalScore();
             const submission = {
-                user_id: user.id,
-                assessment_id: assessment.id,
+                userId: user.uid,
+                assessmentId: assessment.id,
+                assessmentName: assessment.name,
                 responses: { answers, comments },
-                total_score: calculateTotalScore(),
-                // If isCompleting is true, we might mark it finished, otherwise it's in progress
-                // For now, we only mark completed_at if every single question is answered
-                completed_at: isCompleting && isAllQuestionsAnswered() ? new Date().toISOString() : null
+                totalScore: totalScore,
+                updatedAt: serverTimestamp(),
+                completedAt: isCompleting && isAllQuestionsAnswered() ? serverTimestamp() : null
             };
 
             // Check if existing record
-            const { data: existing } = await supabase
-                .from('user_assessments')
-                .select('id')
-                .eq('user_id', user.id)
-                .eq('assessment_id', assessment.id)
-                .single();
+            const historyRef = collection(db, 'user_assessments');
+            const q = query(
+                historyRef,
+                where('userId', '==', user.uid),
+                where('assessmentId', '==', assessment.id),
+                limit(1)
+            );
 
-            if (existing) {
-                await supabase
-                    .from('user_assessments')
-                    .update(submission)
-                    .eq('id', existing.id);
+            const querySnapshot = await getDocs(q);
+            
+            if (!querySnapshot.empty) {
+                const existingDoc = querySnapshot.docs[0];
+                await updateDoc(doc(db, 'user_assessments', existingDoc.id), submission);
             } else {
-                await supabase
-                    .from('user_assessments')
-                    .insert([submission]);
+                // If no existing, add new
+                await setDoc(doc(collection(db, 'user_assessments')), {
+                    ...submission,
+                    createdAt: serverTimestamp()
+                });
             }
         } catch (err) {
             console.error("Error saving progress:", err);
@@ -77,22 +94,31 @@ export default function QuizPage() {
     const fetchQuizData = async () => {
         try {
             setLoading(true);
-            const { data: assessmentData, error: assessmentError } = await supabase
-                .from('assessments')
-                .select('*')
-                .eq('slug', slug)
-                .single();
+            
+            // 1. Fetch Assessment
+            const assessmentsRef = collection(db, 'assessments');
+            const q = query(assessmentsRef, where('slug', '==', slug), limit(1));
+            const querySnapshot = await getDocs(q);
 
-            if (assessmentError) throw assessmentError;
+            if (querySnapshot.empty) {
+                console.error("Assessment not found");
+                setLoading(false);
+                return;
+            }
+
+            const assessmentDoc = querySnapshot.docs[0];
+            const assessmentData = { id: assessmentDoc.id, ...assessmentDoc.data() };
             setAssessment(assessmentData);
 
-            const { data: questionsData, error: questionsError } = await supabase
-                .from('assessment_questions')
-                .select('*')
-                .eq('assessment_id', assessmentData.id)
-                .order('question_number');
-
-            if (questionsError) throw questionsError;
+            // 2. Fetch Questions
+            const questionsRef = collection(db, 'assessment_questions');
+            const qQuestions = query(
+                questionsRef,
+                where('assessment_id', '==', assessmentData.id),
+                orderBy('question_number')
+            );
+            const questionsSnapshot = await getDocs(qQuestions);
+            const questionsData = questionsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
             // Group by section
             const grouped = {};
@@ -110,24 +136,29 @@ export default function QuizPage() {
             setGroupedQuestions(grouped);
             setSections(sectionList);
 
-            // Fetch existing answers if logged in
+            // 3. Fetch existing answers if logged in
             if (user) {
-                const { data: userData } = await supabase
-                    .from('user_assessments')
-                    .select('responses')
-                    .eq('user_id', user.id)
-                    .eq('assessment_id', assessmentData.id)
-                    .single();
-
-                if (userData?.responses) {
-                    setAnswers(userData.responses.answers || {});
-                    setComments(userData.responses.comments || {});
+                const historyRef = collection(db, 'user_assessments');
+                const qHistory = query(
+                    historyRef,
+                    where('userId', '==', user.uid),
+                    where('assessmentId', '==', assessmentData.id),
+                    limit(1)
+                );
+                const historySnapshot = await getDocs(qHistory);
+                
+                if (!historySnapshot.empty) {
+                    const userData = historySnapshot.docs[0].data();
+                    if (userData?.responses) {
+                        setAnswers(userData.responses.answers || {});
+                        setComments(userData.responses.comments || {});
+                    }
                 }
             }
 
         } catch (error) {
             console.error('Error fetching quiz:', error);
-            alert('Failed to load quiz.');
+            alert('Failed to load quiz data.');
         } finally {
             setLoading(false);
         }

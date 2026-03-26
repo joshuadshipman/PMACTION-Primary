@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { notificationService } from '../lib/services/notificationService';
-import { supabase } from '../lib/supabaseClient';
 
 export default function NotificationManager() {
     const [permissionGranted, setPermissionGranted] = useState(false);

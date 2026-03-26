@@ -1,0 +1,72 @@
+﻿{
+  "status": "success",
+  "result": [
+    {
+      "projectId": "ara-master-2026",
+      "projectNumber": "600966032923",
+      "displayName": "ARA-Master-2026",
+      "name": "projects/ara-master-2026",
+      "resources": {
+        "hostingSite": "ara-master-2026",
+        "realtimeDatabaseInstance": "ara-master-2026-default-rtdb"
+      },
+      "state": "ACTIVE",
+      "etag": "1_b0c38214-79d2-43af-b95d-d2a15dfd8e7f"
+    },
+    {
+      "projectId": "legal-case-app-f74a7",
+      "projectNumber": "56245500286",
+      "displayName": "Legal-Case-App",
+      "name": "projects/legal-case-app-f74a7",
+      "resources": {
+        "hostingSite": "legal-case-app-f74a7"
+      },
+      "state": "ACTIVE",
+      "etag": "1_b9cf954b-1adc-4516-b7ac-12f42e521fc1"
+    },
+    {
+      "projectId": "pmactioncontent",
+      "projectNumber": "641138210001",
+      "displayName": "PMActionContent",
+      "name": "projects/pmactioncontent",
+      "resources": {
+        "hostingSite": "pmactioncontent"
+      },
+      "state": "ACTIVE",
+      "etag": "1_a6d54386-f099-487b-a390-732319321885"
+    },
+    {
+      "projectId": "shipman-shopping-app",
+      "projectNumber": "473476587438",
+      "displayName": "Shipman Shopping App",
+      "name": "projects/shipman-shopping-app",
+      "resources": {
+        "hostingSite": "shipman-shopping-app"
+      },
+      "state": "ACTIVE",
+      "etag": "1_2327013d-b891-421b-b90c-e3f7ef3c76b4"
+    },
+    {
+      "projectId": "texas-total-loss",
+      "projectNumber": "17890951073",
+      "displayName": "Texas Total Loss",
+      "name": "projects/texas-total-loss",
+      "resources": {
+        "hostingSite": "texas-total-loss"
+      },
+      "state": "ACTIVE",
+      "etag": "1_dcb4d4ee-c79d-4f49-837a-a66b8174777f"
+    },
+    {
+      "projectId": "total-loss-intake-bot",
+      "projectNumber": "135403123084",
+      "displayName": "Total-Loss-Intake-Bot",
+      "name": "projects/total-loss-intake-bot",
+      "resources": {
+        "hostingSite": "total-loss-intake-bot"
+      },
+      "state": "ACTIVE",
+      "etag": "1_94ba6ed9-cac8-4075-80c0-46d95b08ce9e"
+    }
+  ]
+}

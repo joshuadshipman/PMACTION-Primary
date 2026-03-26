@@ -1,5 +1,17 @@
 import { useState } from 'react';
-import { supabase } from '../../lib/supabaseClient';
+import { auth, db } from '../../lib/firebaseClient';
+import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth';
+import { 
+    doc, 
+    setDoc, 
+    updateDoc, 
+    collection, 
+    addDoc, 
+    query, 
+    where, 
+    getDocs, 
+    serverTimestamp 
+} from 'firebase/firestore';
 import { ChevronRight, Shield, Brain, Target, Check, Sparkles } from 'lucide-react';
 import Link from 'next/link';
 
@@ -305,40 +317,34 @@ function AccountScreen({ data, setData, onNext, onBack }) {
         setLoading(true);
         setError(null);
         try {
-            const { data: authData, error: signUpError } = await supabase.auth.signUp({
-                email: data.email,
-                password: data.password,
+            const userCredential = await createUserWithEmailAndPassword(auth, data.email, data.password);
+            const user = userCredential.user;
+
+            // Create profile in Firestore
+            const userDocRef = doc(db, 'users', user.uid);
+            await setDoc(userDocRef, {
+                uid: user.uid,
+                email: user.email,
+                onboarding_data: {
+                    concerns: data.concerns || [],
+                    ageRange: data.ageRange || ''
+                },
+                notificationPreferences: {
+                    daily_reminder: true,
+                    reminder_time: data.reminderTime || '09:00'
+                },
+                onboardingComplete: false,
+                xp: 0,
+                level: 1,
+                current_streak: 0,
+                createdAt: serverTimestamp(),
+                updatedAt: serverTimestamp()
             });
-
-            if (signUpError) throw signUpError;
-
-            // Wait for auth to settle (sometimes session creation is async)
-            if (authData?.user) {
-                const { error: profileError } = await supabase
-                    .from('profiles')
-                    .update({
-                        onboarding_data: {
-                            concerns: data.concerns,
-                            ageRange: data.ageRange
-                        },
-                        // Default reminder time in JSON for now, can be moved to dedicated column later if needed
-                        notification_preferences: {
-                            daily_reminder: true,
-                            reminder_time: data.reminderTime
-                        },
-                        onboarding_complete: false // Will mark true after challenge selection
-                    })
-                    .eq('id', authData.user.id);
-
-                if (profileError) {
-                    console.error("Profile update error:", profileError);
-                    // Continue anyway, don't block signup flow
-                }
-            }
 
             // If successful, proceed
             onNext();
         } catch (err) {
+            console.error("Signup error:", err);
             setError(err.message);
         } finally {
             setLoading(false);
@@ -542,32 +548,25 @@ function AssessmentScreen({ onNext, onBack }) {
     const handleComplete = async () => {
         setSubmitting(true);
         try {
-            const { data: { user } } = await supabase.auth.getUser();
+            const user = auth.currentUser;
             if (user) {
                 // Calculate score
                 const totalScore = Object.values(answers).reduce((a, b) => a + b, 0);
 
-                // Get wellness assessment ID (Assuming it exists from seed)
-                const { data: assessment } = await supabase
-                    .from('assessments')
-                    .select('id')
-                    .eq('slug', 'wellness-check')
-                    .single();
-
-                if (assessment) {
-                    await supabase.from('user_assessments').insert({
-                        user_id: user.id,
-                        assessment_id: assessment.id,
-                        responses: answers,
-                        total_score: totalScore,
-                        completed_at: new Date().toISOString()
-                    });
-                }
+                // Save screening results to Firestore
+                const userAssessmentsRef = collection(db, 'user_assessments');
+                await addDoc(userAssessmentsRef, {
+                    userId: user.uid,
+                    assessmentName: 'Wellness Check',
+                    score: totalScore,
+                    answers: answers,
+                    completedAt: serverTimestamp(),
+                    totalScore: totalScore 
+                });
             }
             onNext();
         } catch (error) {
             console.error('Error saving assessment:', error);
-            // Proceed even on error for now
             onNext();
         } finally {
             setSubmitting(false);
@@ -655,30 +654,26 @@ function ChallengeScreen({ data, onNext }) {
     const handleStart = async () => {
         setStarting(true);
         try {
-            const { data: { user } } = await supabase.auth.getUser();
+            const user = auth.currentUser;
             if (user) {
-                // Get challenge ID
-                const { data: challenge } = await supabase
-                    .from('challenges')
-                    .select('id')
-                    .eq('slug', recommendedChallenge.slug)
-                    .single();
+                // Create user challenge in Firestore
+                const userChallengesRef = collection(db, 'user_challenges');
+                await addDoc(userChallengesRef, {
+                    userId: user.uid,
+                    challengeId: recommendedChallenge.slug,
+                    startDate: serverTimestamp(),
+                    status: 'active',
+                    title: recommendedChallenge.title
+                });
 
-                if (challenge) {
-                    await supabase.from('user_challenges').insert({
-                        user_id: user.id,
-                        challenge_id: challenge.id,
-                        start_date: new Date().toISOString(),
-                        status: 'active'
-                    });
-
-                    // Update profile completion
-                    await supabase.from('profiles').update({
-                        onboarding_complete: true
-                    }).eq('id', user.id);
-                }
+                // Update profile completion in Firestore
+                const userDocRef = doc(db, 'users', user.uid);
+                await updateDoc(userDocRef, {
+                    onboardingComplete: true,
+                    updatedAt: serverTimestamp()
+                });
             }
-            onNext(); // Navigate to Dashboard/Home (currently just ends flow)
+            onNext(); 
         } catch (error) {
             console.error('Error starting challenge:', error);
             onNext();

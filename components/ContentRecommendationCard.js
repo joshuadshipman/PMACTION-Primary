@@ -5,6 +5,7 @@ import { useRouter } from 'next/router';
 import { useApp } from '../lib/context';
 import { BLOG_POSTS } from '../lib/blogData';
 import { CHALLENGES } from '../lib/challengesData';
+import { getPersonaForUser } from '../lib/personalization/personaEngine';
 
 export default function ContentRecommendationCard() {
     const router = useRouter();
@@ -24,6 +25,7 @@ export default function ContentRecommendationCard() {
                 // Approximate mood history from wins
                 const recentMoods = wins.filter(w => w.label === 'Mood Check-in').slice(0, 5);
                 const interests = userProfile?.interests || ['General Wellness'];
+                const persona = getPersonaForUser(userProfile);
 
                 // Call the API Route instead of direct service
                 const response = await fetch('/api/generate-recommendations', {
@@ -32,7 +34,8 @@ export default function ContentRecommendationCard() {
                     body: JSON.stringify({
                         moods: recentMoods,
                         recentWins: wins.slice(0, 3),
-                        interests
+                        interests,
+                        persona
                     })
                 });
 

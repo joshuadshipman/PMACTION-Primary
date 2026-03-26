@@ -1,8 +1,7 @@
-import React, { useState, useEffect } from 'react';
-import Head from 'next/head';
-import { useRouter } from 'next/router';
 import { useApp } from '../lib/context';
-import { supabase } from '../lib/supabaseClient';
+import { auth, db } from '../lib/firebaseClient';
+import { signOut } from 'firebase/auth';
+import { collection, query, where, orderBy, limit, getDocs } from 'firebase/firestore';
 import { motion } from 'framer-motion';
 import AddWinModal from '../components/AddWinModal';
 import LevelUpModal from '../components/LevelUpModal';
@@ -17,6 +16,10 @@ import TimeDurationCards from '../components/TimeDurationCards';
 import ContentRecommendationCard from '../components/ContentRecommendationCard';
 import DailyTrainingCard from '../components/DailyTrainingCard';
 import { AICoachModal } from '../components/AICoachModal';
+import MerchandiseSection from '../components/MerchandiseSection';
+import SEOHead from '../components/SEOHead';
+import TrendingNowWidget from '../components/TrendingNowWidget';
+import { getDashboardPersonaConfig } from '../components/DashboardPersonaConfig';
 // New Interactive Modals
 import { GuidedExerciseModal } from '../components/GuidedExerciseModal';
 import FocusTimerModal from '../components/FocusTimerModal';
@@ -25,14 +28,14 @@ import VisualTimer from '../components/VisualTimer';
 import ErrorBoundary from '../components/ErrorBoundary';
 import FeedbackModal from '../components/FeedbackModal';
 import { MessageSquarePlus } from 'lucide-react';
+import { useState, useEffect, useMemo } from 'react';
 
 const DashboardPage = () => {
     const router = useRouter();
-    const { user, stats, dailyLogs, wins, addWin } = useApp(); // Removed userProfile/activeChallenge to rely on fresh fetch
+    const { user, stats, dailyLogs, wins, addWin, userProfile } = useApp();
 
     // Local State for fetched Data
-    const [profile, setProfile] = useState(null);
-    const [activeChallengeData, setActiveChallengeData] = useState(null); // Renamed from dbChallenge for clarity
+    const [activeChallengeData, setActiveChallengeData] = useState(null); 
     const [isLoading, setIsLoading] = useState(true);
 
     const [isWinModalOpen, setIsWinModalOpen] = useState(false);
@@ -53,74 +56,53 @@ const DashboardPage = () => {
     const [greeting, setGreeting] = useState({ text: 'Welcome back', tip: 'Ready to focus?' });
     const [showConfetti, setShowConfetti] = useState(false);
 
-    // 1. Time-aware Smart Greeting Logic
+    // Persona Configuration (memoized)
+    const personaConfig = useMemo(() => getDashboardPersonaConfig(userProfile), [userProfile]);
+
+    // 1. Time-aware Smart Greeting Logic (persona-adapted)
     useEffect(() => {
         const updateGreeting = () => {
             const hour = new Date().getHours();
+            const tip = personaConfig.getGreetingTip();
             if (hour >= 5 && hour < 12) {
-                setGreeting({ text: 'Good Morning', tip: 'High focus window. Tackle the big rock.' });
+                setGreeting({ text: 'Good Morning', tip });
             } else if (hour >= 12 && hour < 17) {
-                setGreeting({ text: 'Good Afternoon', tip: 'Energy dip? Try a 10-min reset.' });
+                setGreeting({ text: 'Good Afternoon', tip });
             } else if (hour >= 17 && hour < 22) {
-                setGreeting({ text: 'Good Evening', tip: 'Wind down and reflect on wins.' });
+                setGreeting({ text: 'Good Evening', tip });
             } else {
-                setGreeting({ text: 'Late Night', tip: 'Sleep is the best productivity tool.' });
+                setGreeting({ text: 'Late Night', tip });
             }
         };
         updateGreeting();
         const interval = setInterval(updateGreeting, 60000);
         return () => clearInterval(interval);
-    }, []);
+    }, [personaConfig]);
 
-    // 2. Fetch User Data (Real Data from Supabase)
+    // 2. Fetch User Data (Active Challenges from Firestore)
     useEffect(() => {
         const fetchDashboardData = async () => {
-            // If no user, maybe waiting for auth?
-            // But if context says user is null, we can't fetch.
             if (!user) return;
 
             try {
                 setIsLoading(true);
-                // A. Profile (Join with user_points)
-                const { data: profileWithPoints } = await supabase
-                    .from('profiles')
-                    .select('*, user_points(total_points, current_level)')
-                    .eq('id', user.id)
-                    .single();
+                // Fetch Active Challenge from Firestore
+                const userChallsRef = collection(db, 'user_challenges');
+                const q = query(
+                    userChallsRef,
+                    where('userId', '==', user.uid),
+                    where('status', '==', 'active'),
+                    orderBy('startDate', 'desc'),
+                    limit(1)
+                );
 
-                if (profileWithPoints) {
-                    setProfile({
-                        ...profileWithPoints,
-                        // Handle flattened structure or use safely
-                        total_points: profileWithPoints.user_points?.total_points || 0,
-                        current_level: profileWithPoints.user_points?.current_level || 1,
-                        // Use nickname or fallback to email name
-                        nickname: profileWithPoints.onboarding_data?.nickname || user.email.split('@')[0]
+                const querySnapshot = await getDocs(q);
+                if (!querySnapshot.empty) {
+                    const active = querySnapshot.docs[0].data();
+                    setActiveChallengeData({
+                        id: active.challengeId,
+                        startDate: active.startDate?.toDate ? active.startDate.toDate().toISOString() : active.startDate
                     });
-                }
-
-                // B. Active Challenge
-                const { data: userChalls } = await supabase
-                    .from('user_challenges')
-                    .select('*, challenges(slug, title)')
-                    .eq('user_id', user.id)
-                    .eq('status', 'active')
-                    .order('start_date', { ascending: false })
-                    .limit(1);
-
-                if (userChalls && userChalls.length > 0) {
-                    const active = userChalls[0];
-                    // Map DB slug to JS ID (Simple mapping)
-                    let jsId = null;
-                    if (active.challenges?.slug === 'mindfulness-journey') jsId = 'mindfulness_journey_7_day';
-                    else if (active.challenges?.slug === 'communication-journey') jsId = 'communication_journey_7_day';
-
-                    if (jsId) {
-                        setActiveChallengeData({
-                            id: jsId,
-                            startDate: active.start_date
-                        });
-                    }
                 }
             } catch (error) {
                 console.error("Dashboard Fetch Error:", error);
@@ -133,7 +115,7 @@ const DashboardPage = () => {
     }, [user]);
 
     const handleLogout = async () => {
-        await supabase.auth.signOut();
+        await signOut(auth);
         router.push('/login');
     };
 
@@ -202,16 +184,18 @@ const DashboardPage = () => {
     // Calculate progress (Visual only if no real XP logic in frontend yet)
     // We used profile.total_points for raw XP. 
     // Let's assume 100 XP per level for visual bar if not defined logic.
-    const currentLevelNum = profile?.current_level || 1;
-    const currentXp = profile?.total_points || 0;
-    const progressPercent = Math.min(100, (currentXp % 500) / 500 * 100); // 500 XP per level assumption
+    // Calculate progress
+    const currentLevelNum = userProfile?.level || 1;
+    const currentXp = userProfile?.xp || 0;
+    const progressPercent = Math.min(100, (currentXp % 500) / 500 * 100); 
 
     return (
         <div className="min-h-screen mesh-gradient-bg pb-20 md:pb-0 bg-slate-50">
-            <Head>
-                <title>Dashboard | PMAction</title>
-                <meta name="description" content="Your personal dashboard for mental well-being" />
-            </Head>
+            <SEOHead 
+                title="Your Dashboard" 
+                description="Your personalized neuro-inclusive dashboard for mental wellness and daily progress."
+                keywords={["ADHD Dashboard", "Neurodivergent Wellness", "PMA Tracking"]}
+            />
 
             <AddWinModal
                 isOpen={isWinModalOpen}
@@ -241,7 +225,7 @@ const DashboardPage = () => {
             {isExerciseOpen && <GuidedExerciseModal exerciseTitle={selectedExercise?.name} onClose={() => setIsExerciseOpen(false)} />}
             {isFocusTimerOpen && <FocusTimerModal onClose={() => setIsFocusTimerOpen(false)} onComplete={handleFocusComplete} />}
             {isFeedbackOpen && <FeedbackModal onClose={() => setIsFeedbackOpen(false)} />}
-            {showConfetti && <Confetti recycle={false} numberOfPieces={200} />}
+            {personaConfig.shouldShowConfetti() && showConfetti && <Confetti recycle={false} numberOfPieces={200} />}
 
             {/* Navigation (Liquid Glass) */}
             <nav className="glass-panel sticky top-0 z-50 mb-8 rounded-b-2xl mx-4 mt-2">
@@ -252,7 +236,7 @@ const DashboardPage = () => {
                         </div>
                         <div className="flex items-center space-x-4">
                             <div className="hidden md:flex items-center mr-4 bg-blue-50 px-3 py-1 rounded-full">
-                                <span className="text-sm font-bold text-blue-800 mr-2">Level {currentLevelNum}</span>
+                                <span className="text-sm font-bold text-blue-800 mr-2">{personaConfig.getLevelLabel(currentLevelNum)}</span>
                                 <div className="w-24 h-2 bg-blue-200 rounded-full overflow-hidden">
                                     <div className="h-full bg-blue-500 transition-all duration-500" style={{ width: `${progressPercent}%` }} />
                                 </div>
@@ -309,7 +293,7 @@ const DashboardPage = () => {
                                 <div className="absolute -top-20 -right-20 w-80 h-80 bg-gradient-to-br from-purple-400/30 to-blue-400/30 rounded-full blur-3xl"></div>
                                 <div className="relative z-10 mb-8">
                                     <h2 className="text-4xl font-black text-gray-900 tracking-tight mb-2">
-                                        {greeting.text}, <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600">{profile?.nickname || 'Friend'}</span>.
+                                        {greeting.text}, <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600">{userProfile?.nickname || user?.email?.split('@')[0] || 'Friend'}</span>.
                                     </h2>
                                     <p className="text-gray-600 font-medium text-lg flex items-center gap-3">
                                         <span className="inline-block w-3 h-3 rounded-full bg-green-400 animate-pulse"></span>
@@ -322,11 +306,11 @@ const DashboardPage = () => {
                                         <div className="text-xs font-bold text-indigo-400 uppercase">Level</div>
                                     </div>
                                     <div className="p-4 bg-white/40 rounded-2xl text-center border border-white/50">
-                                        <div className="text-3xl font-bold text-purple-600">{profile?.total_points || 0}</div>
+                                        <div className="text-3xl font-bold text-purple-600">{userProfile?.xp || 0}</div>
                                         <div className="text-xs font-bold text-purple-400 uppercase">XP</div>
                                     </div>
                                     <div className="p-4 bg-white/40 rounded-2xl text-center border border-white/50">
-                                        <div className="text-3xl font-bold text-orange-600">{stats?.streak || 0}</div>
+                                        <div className="text-3xl font-bold text-orange-600">{personaConfig.getStreakDisplay(stats?.streak || 0)}</div>
                                         <div className="text-xs font-bold text-orange-400 uppercase">Streak</div>
                                     </div>
                                     <div className="p-4 bg-white/40 rounded-2xl text-center border border-white/50">
@@ -360,7 +344,7 @@ const DashboardPage = () => {
                                             <span className="ml-auto font-bold text-blue-600">+{win.xp} XP</span>
                                         </div>
                                     )) : (
-                                        <p className="text-gray-400 text-center py-4">No wins yet today. Go get one!</p>
+                                        <p className="text-gray-400 text-center py-4">{personaConfig.getEmptyWinsMessage()}</p>
                                     )}
                                 </div>
                                 </div>
@@ -401,6 +385,14 @@ const DashboardPage = () => {
                                     }
                                 }}
                                 />
+                            </ErrorBoundary>
+
+                            <ErrorBoundary>
+                                <MerchandiseSection userTraits={userProfile?.traits} currentFocus="Productivity" />
+                            </ErrorBoundary>
+
+                            <ErrorBoundary>
+                                <TrendingNowWidget userProfile={userProfile} />
                             </ErrorBoundary>
 
                             {/* ACTIVE CHALLENGE CARD (Using Real Data) */}

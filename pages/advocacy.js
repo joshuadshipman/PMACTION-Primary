@@ -11,7 +11,8 @@ import { BLOG_POSTS } from '../lib/blogData';
 // Add imports
 import { fetchPlaylistItems } from '../lib/services/youtubeService';
 import { generateBlogFromVideoData } from '../lib/services/geminiService'; // Ensure this function is exported from geminiService
-import { supabase } from '../lib/supabaseClient';
+import { auth, db } from '../lib/firebaseClient';
+import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 
 const BlogGenerator = ({ addBlogPost }) => {
     const [mode, setMode] = useState('theme'); // 'theme' or 'youtube'
@@ -26,14 +27,17 @@ const BlogGenerator = ({ addBlogPost }) => {
         setError('');
         try {
             if (mode === 'youtube') {
-                // 1. Get Session for Token
-                const { data: { session } } = await supabase.auth.getSession();
-                const providerToken = session?.provider_token;
-
-                if (!providerToken) {
-                    // MVP Fallback
-                    throw new Error("YouTube Connection required. Please Sign Out and Sign In with Google (ensure 'YouTube' scope is checked).");
+                // In Firebase, provider tokens are not directly on the auth object after login.
+                // Assuming YouTube token is handled via a custom secure flow or re-login.
+                // For now, we check if the user is signed in.
+                if (!user) {
+                    throw new Error("Please Sign In to use YouTube integration.");
                 }
+
+                // Note: fetchPlaylistItems expects a token. In a full production Firebase app,
+                // you would exchange a refresh token or use a Cloud Function.
+                // This remains a placeholder for the user's specific token management.
+                const providerToken = user.accessToken; // Placeholder or null
 
                 // 2. Fetch Playlist
                 if (!playlistId) throw new Error("Please enter a Playlist ID.");

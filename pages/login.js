@@ -2,7 +2,13 @@
 import { useState, useEffect } from 'react';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
-import { supabase } from '../lib/supabaseClient';
+import { auth } from '../lib/firebaseClient';
+import { 
+  signInWithEmailAndPassword, 
+  createUserWithEmailAndPassword, 
+  signInWithPopup, 
+  GoogleAuthProvider 
+} from 'firebase/auth';
 import { useApp } from '../lib/context';
 
 const LoginPage = () => {
@@ -17,20 +23,8 @@ const LoginPage = () => {
 
   useEffect(() => {
     if (user) {
-      // Check if onboarding is complete (assuming it's a field in user metadata or profile)
-      // For now, we'll just redirect to dashboard if we have a user, 
-      // or onboarding if we want to enforce it.
-      // The previous logic checked user.onboarding_complete. 
-      // Since we are using the raw supabase user object from context, it might not have that property directly on the root.
-      // It's usually in user.user_metadata.onboarding_complete
-
-      const onboardingComplete = user.user_metadata?.onboarding_complete;
-
-      if (onboardingComplete) {
-        router.push('/dashboard');
-      } else {
-        router.push('/onboarding/welcome');
-      }
+      // Direct redirect for now, profile-based logic can be added later
+      router.push('/dashboard');
     }
   }, [user, router]);
 
@@ -40,36 +34,15 @@ const LoginPage = () => {
     setIsSubmitting(true);
 
     try {
-      let response;
       if (isSignUp) {
-        response = await supabase.auth.signUp({
-          email,
-          password,
-        });
-      } else {
-        response = await supabase.auth.signInWithPassword({
-          email,
-          password,
-        });
-      }
-
-      const { data, error } = response;
-
-      if (error) throw error;
-
-      if (isSignUp && data.session) {
+        await createUserWithEmailAndPassword(auth, email, password);
         router.push('/onboarding/welcome');
-      } else if (!isSignUp && data.session) {
-        // The useEffect will handle the redirect
-      } else if (isSignUp && !data.session) {
-        setError('Please check your email for confirmation.');
+      } else {
+        await signInWithEmailAndPassword(auth, email, password);
+        // useEffect handles redirect
       }
     } catch (err) {
-      if (err.message === 'Invalid login credentials') {
-        setError('Invalid credentials. Have you confirmed your email?');
-      } else {
-        setError(err.message);
-      }
+      setError(err.message);
     } finally {
       setIsSubmitting(false);
     }
@@ -77,10 +50,8 @@ const LoginPage = () => {
 
   const handleGoogleSignIn = async () => {
     try {
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider: 'google',
-      });
-      if (error) throw error;
+      const provider = new GoogleAuthProvider();
+      await signInWithPopup(auth, provider);
     } catch (err) {
       setError(err.message);
     }

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { supabase } from '../lib/supabaseClient';
+import { db } from '../lib/firebaseClient';
+import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import { MessageSquare, Bug, Lightbulb, CheckCircle2 } from 'lucide-react';
 import { useApp } from '../lib/context';
 
@@ -19,16 +20,13 @@ export default function FeedbackModal({ onClose }) {
         setError('');
 
         try {
-            const { error: dbError } = await supabase
-                .from('user_feedback')
-                .insert([{
-                    user_id: user.id,
-                    type,
-                    description: description.trim(),
-                    status: 'new'
-                }]);
-
-            if (dbError) throw dbError;
+            await addDoc(collection(db, 'user_feedback'), {
+                userId: user.uid,
+                type,
+                description: description.trim(),
+                status: 'new',
+                createdAt: serverTimestamp()
+            });
             
             setSuccess(true);
             setTimeout(() => {

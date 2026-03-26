@@ -1,24 +1,23 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/router'; // Added import
+import { useRouter } from 'next/router';
 import { motion } from 'framer-motion';
-import Head from 'next/head';
+import SEOHead from '../components/SEOHead';
 import PMASlotMachine from '../components/PMASlotMachine';
 
 const Home = () => {
-  const router = useRouter(); // Fix: Added missing router
-  const [showWinnerMessage, setShowWinnerMessage] = useState(false);
-  const handleJackpotComplete = () => {
-    setShowWinnerMessage(true);
-  };
+    const router = useRouter();
+    const [showWinnerMessage, setShowWinnerMessage] = useState(false);
+    const handleJackpotComplete = () => {
+        setShowWinnerMessage(true);
+    };
 
-  return (
-    <div className="min-h-screen bg-white font-sans text-gray-900 selection:bg-green-100 selection:text-green-900 overflow-x-hidden">
-      <Head>
-        <title>PMAction | Positive Mental Action & Neurodiversity Tools</title>
-        <meta name="description" content="Your personalized journey to Positive Mental Wellness. Neurodiversity-friendly habit tracking, mood logging, and tools for ADHD/Autism." />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-      </Head>
+    return (
+        <div className="min-h-screen bg-white font-sans text-gray-900 selection:bg-green-100 selection:text-green-900 overflow-x-hidden">
+            <SEOHead 
+                title="Personal Mental Action & Neurodiversity Hub" 
+                keywords={["ADHD productivity", "Autism wellness", "Habit tracking", "Positive Mental Action", "AEO", "Mental Health AI"]}
+            />
 
       {/* --- Navigation --- */}
       <nav className="fixed top-0 w-full z-50 bg-white/80 backdrop-blur-md border-b border-gray-100 transition-all duration-300">

@@ -3,6 +3,8 @@ import { useState, useEffect } from 'react';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { useApp } from '../../lib/context';
+import { db } from '../../lib/firebaseClient';
+import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 
 const ScreeningPage = () => {
   const router = useRouter();
@@ -62,7 +64,23 @@ const ScreeningPage = () => {
 
   const handleFinish = async () => {
     try {
-      console.log('Screening Results:', { user_id: user?.id, score, answers });
+      if (!user) {
+        router.push('/login');
+        return;
+      }
+
+      // Save screening results to Firestore
+      const userAssessmentsRef = collection(db, 'user_assessments');
+      await addDoc(userAssessmentsRef, {
+        userId: user.uid,
+        assessmentName: 'Initial Screening',
+        score: score,
+        answers: answers,
+        completedAt: serverTimestamp(),
+        totalScore: score // Aligning with the history query in assessments.js
+      });
+
+      console.log('Screening Results saved to Firestore');
       router.push('/dashboard');
     } catch (err) {
       console.error('Error saving screening results:', err);

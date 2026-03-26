@@ -2,9 +2,42 @@ import React from 'react';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { motion } from 'framer-motion';
+import { useApp } from '../lib/context';
+import { getPersonaForUser } from '../lib/personalization/personaEngine';
 
 export default function PricingPage() {
     const router = useRouter();
+    const { user, userProfile } = useApp() || {};
+
+    const handleCheckout = async (priceId) => {
+        if (!user) {
+            router.push('/login?redirect=/pricing');
+            return;
+        }
+
+        const persona = getPersonaForUser(userProfile);
+
+        try {
+            const response = await fetch('/api/payments/create-checkout', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ 
+                    priceId,
+                    userId: user.uid,
+                    email: user.email,
+                    personaId: persona?.id || 'universal'
+                }),
+            });
+            const data = await response.json();
+            if (data.url) {
+                window.location.href = data.url;
+            } else {
+                console.error("No checkout URL returned:", data);
+            }
+        } catch (error) {
+            console.error('Error initiating checkout:', error);
+        }
+    };
 
     const plans = [
         {
@@ -20,6 +53,7 @@ export default function PricingPage() {
             ],
             buttonText: "Current Plan",
             buttonStyle: "bg-gray-200 text-gray-700 cursor-default",
+            action: () => router.push('/dashboard'),
             popular: false
         },
         {
@@ -36,6 +70,7 @@ export default function PricingPage() {
             ],
             buttonText: "Upgrade to Premium",
             buttonStyle: "bg-gradient-to-r from-fuchsia-500 to-indigo-600 text-white shadow-xl hover:shadow-2xl transform hover:-translate-y-1 transition-all",
+            action: () => handleCheckout(process.env.NEXT_PUBLIC_STRIPE_PREMIUM_PRICE_ID || 'price_premium_placeholder'),
             popular: true
         }
     ];
@@ -102,6 +137,7 @@ export default function PricingPage() {
                                 </ul>
 
                                 <button
+                                    onClick={plan.action}
                                     className={`w-full py-4 rounded-xl font-bold text-lg ${plan.buttonStyle}`}
                                 >
                                     {plan.buttonText}

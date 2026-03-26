@@ -7,7 +7,9 @@ function MyApp({ Component, pageProps }) {
   return (
     <AppProvider>
       <OnboardingProvider>
-        <Component {...pageProps} />
+        <div className="max-w-md mx-auto min-h-screen bg-white shadow-2xl relative overflow-hidden sm:border-x sm:border-gray-200">
+          <Component {...pageProps} />
+        </div>
       </OnboardingProvider>
     </AppProvider>
   );

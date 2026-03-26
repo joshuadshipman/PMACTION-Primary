@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
-import { supabase } from '../lib/supabaseClient';
+import { auth } from '../lib/firebaseClient';
+import { signInWithEmailAndPassword } from 'firebase/auth';
 import { useRouter } from 'next/router';
 
 export default function MagicLogin() {
@@ -9,16 +10,12 @@ export default function MagicLogin() {
     useEffect(() => {
         const login = async () => {
             setStatus('Attempting login for testuser@example.com...');
-            const { data, error } = await supabase.auth.signInWithPassword({
-                email: 'testuser@example.com',
-                password: 'password123',
-            });
-
-            if (error) {
-                setStatus('Error: ' + error.message);
-            } else {
+            try {
+                await signInWithEmailAndPassword(auth, 'testuser@example.com', 'password123');
                 setStatus('Success! Redirecting...');
                 setTimeout(() => router.push('/dashboard'), 2000);
+            } catch (error) {
+                setStatus('Error: ' + error.message);
             }
         };
 

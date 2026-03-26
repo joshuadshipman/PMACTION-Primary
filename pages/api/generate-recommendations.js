@@ -6,13 +6,14 @@ export default async function handler(req, res) {
     }
 
     try {
-        const { moods, recentWins, interests } = req.body;
+        const { moods, recentWins, interests, persona } = req.body;
 
         // Server-side call (Can access GEMINI_API_KEY)
         const recommendations = await generateContentRecommendations({
             moods,
             recentWins,
-            interests
+            interests,
+            persona
         });
 
         if (!recommendations) {

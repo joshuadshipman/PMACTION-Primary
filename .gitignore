@@ -136,3 +136,11 @@ dist
 .pnp.*
 .vercel
 .env*.local
+
+# Temporary logs and SA keys
+service-account-key.json
+*apps.json
+*sdkconfig.json
+*sdkconfig_utf8.json
+*.txt
+projects*.json

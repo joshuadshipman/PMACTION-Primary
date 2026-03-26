@@ -2,7 +2,21 @@ import React, { useState, useEffect } from 'react';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { useApp } from '../../../../lib/context'; // Adjust path as needed
-import { supabase } from '../../../../lib/supabaseClient';
+import { auth, db } from '../../../../lib/firebaseClient';
+import { 
+    collection, 
+    query, 
+    where, 
+    getDocs, 
+    getDoc, 
+    doc, 
+    setDoc, 
+    addDoc,
+    updateDoc, 
+    orderBy, 
+    limit, 
+    serverTimestamp 
+} from 'firebase/firestore';
 import ReactMarkdown from 'react-markdown';
 import GeminiDeepDive from '../../../../components/GeminiDeepDive';
 
@@ -39,25 +53,26 @@ export default function LessonPage() {
             setLoading(true);
 
             // Fetch challenge
-            const { data: challengeData, error: challengeError } = await supabase
-                .from('challenges')
-                .select('*')
-                .eq('slug', slug)
-                .single();
+            const challengeRef = doc(db, 'challenges', slug);
+            const challengeSnap = await getDoc(challengeRef);
 
-            if (challengeError) throw challengeError;
+            if (!challengeSnap.exists()) {
+                throw new Error('Challenge not found');
+            }
+            const challengeData = { id: challengeSnap.id, ...challengeSnap.data() };
             setChallenge(challengeData);
 
-            // Fetch task with content
-            const { data: taskData, error: taskError } = await supabase
-                .from('challenge_tasks')
-                .select('*')
-                .eq('challenge_id', challengeData.id)
-                .eq('day_number', day)
-                .single();
+            // Fetch task with content from subcollection
+            const tasksRef = collection(db, 'challenges', slug, 'tasks');
+            const taskQ = query(tasksRef, where('day', '==', parseInt(day)), limit(1));
+            const taskSnap = await getDocs(taskQ);
 
-            if (taskError) throw taskError;
-            setTask(taskData);
+            if (taskSnap.empty) {
+                throw new Error('Task not found');
+            }
+            
+            const taskDoc = taskSnap.docs[0];
+            setTask({ id: taskDoc.id, ...taskDoc.data() });
 
         } catch (error) {
             console.error('Error fetching lesson:', error);
@@ -109,32 +124,36 @@ export default function LessonPage() {
             setCompleting(true);
 
             // Find user_challenge_id
-            const { data: userChallenge } = await supabase
-                .from('user_challenges')
-                .select('id')
-                .eq('user_id', user.id)
-                .eq('challenge_id', challenge.id)
-                .single();
+            const userChallsRef = collection(db, 'user_challenges');
+            const q = query(
+                userChallsRef,
+                where('userId', '==', user.uid),
+                where('challengeId', '==', slug),
+                limit(1)
+            );
+            const joinSnap = await getDocs(q);
 
-            if (userChallenge) {
+            if (!joinSnap.empty) {
+                const userChallengeDoc = joinSnap.docs[0];
+                
                 // Calculate points (base + quiz bonus)
                 let basePoints = task.points || 10;
-                let bonusPoints = quizScore * 5; // 5 points per correct answer
+                let bonusPoints = quizScore * 5; 
                 let totalPoints = basePoints + bonusPoints;
 
-                // Save completion with reflection
-                const { error } = await supabase
-                    .from('challenge_completions')
-                    .upsert([{
-                        user_challenge_id: userChallenge.id,
-                        task_id: task.id,
-                        day_completed: parseInt(day),
-                        completed_at: new Date().toISOString(),
-                        reflection_text: reflection,
-                        points_earned: totalPoints
-                    }], { onConflict: 'user_challenge_id, task_id' });
-
-                if (error) throw error;
+                // Save completion with reflection (Using composite ID for upsert-like behavior)
+                const completionId = `${user.uid}_${slug}_day${day}`;
+                const completionRef = doc(db, 'challenge_completions', completionId);
+                
+                await setDoc(completionRef, {
+                    userId: user.uid,
+                    challengeId: slug,
+                    taskId: task.id,
+                    dayCompleted: parseInt(day),
+                    completedAt: serverTimestamp(),
+                    reflectionText: reflection,
+                    pointsEarned: totalPoints
+                }, { merge: true });
 
                 setFeedback({ type: 'success', message: `Lesson completed! +${totalPoints} XP` });
 
@@ -142,6 +161,8 @@ export default function LessonPage() {
                 setTimeout(() => {
                     router.push(`/challenge/${slug}`);
                 }, 1500);
+            } else {
+                setFeedback({ type: 'error', message: 'Join the challenge first to track progress!' });
             }
         } catch (error) {
             console.error('Error completing lesson:', error);

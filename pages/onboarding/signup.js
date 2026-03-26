@@ -4,7 +4,14 @@ import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { motion } from 'framer-motion';
 import { useOnboarding } from '../../context/OnboardingContext';
-import { supabase } from '../../lib/supabaseClient';
+import { auth } from '../../lib/firebaseClient';
+import { 
+    createUserWithEmailAndPassword, 
+    signInWithPopup, 
+    GoogleAuthProvider,
+    updateProfile 
+} from 'firebase/auth';
+const googleProvider = new GoogleAuthProvider();
 
 const SignupPage = () => {
     const router = useRouter();
@@ -23,27 +30,17 @@ const SignupPage = () => {
             // Store onboarding data in localStorage temporarily
             localStorage.setItem('onboardingData', JSON.stringify(data));
 
-            const { data: authData, error: authError } = await supabase.auth.signUp({
-                email,
-                password,
-                options: {
-                    data: {
-                        onboarding_complete: false, // Will be set to true after profile creation/onboarding sync
-                        ...data // Store initial onboarding data in metadata if needed, or just rely on localStorage/db sync later
-                    }
-                }
-            });
+            const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+            const user = userCredential.user;
 
-            if (authError) throw authError;
-
-            if (authData.session) {
-                // Auto-confirmed or existing session
-                router.push('/auth/callback'); // Or handle directly
-            } else {
-                // Needs email confirmation
-                setError('Please check your email for the confirmation link.');
-                setIsLoading(false);
+            // Update profile with display name if available in data
+            if (data.displayName) {
+                await updateProfile(user, { displayName: data.displayName });
             }
+
+            // In Firebase, the user is signed in immediately after creation.
+            // We can redirect to the callback or next step.
+            router.push('/auth/callback'); 
 
         } catch (err) {
             console.error('Sign up error:', err);
@@ -60,18 +57,11 @@ const SignupPage = () => {
             // Store onboarding data in localStorage temporarily
             localStorage.setItem('onboardingData', JSON.stringify(data));
 
-            // Initiate Google OAuth
-            const { data: authData, error: authError } = await supabase.auth.signInWithOAuth({
-                provider: 'google',
-                options: {
-                    redirectTo: process.env.NODE_ENV === 'production'
-                        ? 'https://pmaction.com/auth/callback'
-                        : `${window.location.origin}/auth/callback`,
-                    scopes: 'https://www.googleapis.com/auth/youtube.readonly'
-                },
-            });
-
-            if (authError) throw authError;
+            // Initiate Google Sign-In with Popup
+            await signInWithPopup(auth, googleProvider);
+            
+            // Redirect after successful sign-in
+            router.push('/auth/callback');
 
         } catch (err) {
             console.error('Sign up error:', err);

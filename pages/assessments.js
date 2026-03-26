@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { useApp } from '../lib/context';
-import { supabase } from '../lib/supabaseClient';
+import { db } from '../lib/firebaseClient';
+import { collection, query, where, orderBy, getDocs } from 'firebase/firestore';
 
 export default function Assessments() {
     const { user } = useApp();
@@ -18,30 +19,33 @@ export default function Assessments() {
     const fetchData = async () => {
         try {
             setLoading(true);
-            // Fetch available assessments
-            const { data: assessmentsData, error: assessmentsError } = await supabase
-                .from('assessments')
-                .select('*')
-                .eq('is_published', true)
-                .order('category');
+            // Fetch available assessments from Firestore
+            const assessmentsRef = collection(db, 'assessments');
+            const q = query(
+                assessmentsRef,
+                where('isPublished', '==', true),
+                orderBy('category')
+            );
 
-            if (assessmentsError) throw assessmentsError;
+            const querySnapshot = await getDocs(q);
+            const assessmentsList = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
-            let historyData = [];
+            let historyList = [];
             if (user) {
-                // Fetch user's history only if logged in
-                const { data: userHistoryData, error: historyError } = await supabase
-                    .from('user_assessments')
-                    .select('*, assessments(name)')
-                    .eq('user_id', user.id)
-                    .order('completed_at', { ascending: false });
+                // Fetch user's history from Firestore
+                const historyRef = collection(db, 'user_assessments');
+                const historyQ = query(
+                    historyRef,
+                    where('userId', '==', user.uid),
+                    orderBy('completedAt', 'desc')
+                );
 
-                if (historyError) throw historyError;
-                historyData = userHistoryData || [];
+                const historySnapshot = await getDocs(historyQ);
+                historyList = historySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
             }
 
-            setAssessments(assessmentsData || []);
-            setUserHistory(historyData);
+            setAssessments(assessmentsList);
+            setUserHistory(historyList);
         } catch (error) {
             console.error('Error fetching assessments:', error);
         } finally {
@@ -133,17 +137,17 @@ export default function Assessments() {
                                     {userHistory.map((attempt) => (
                                         <div key={attempt.id} className="bg-white rounded-xl shadow-sm p-4 border border-gray-100">
                                             <div className="flex justify-between items-center mb-2">
-                                                <span className="font-medium text-gray-900">{attempt.assessments?.name}</span>
+                                                <span className="font-medium text-gray-900">{attempt.assessmentName || 'Assessment'}</span>
                                                 <span className="text-xs text-gray-500">
-                                                    {new Date(attempt.completed_at).toLocaleDateString()}
+                                                    {attempt.completedAt?.toDate ? attempt.completedAt.toDate().toLocaleDateString() : new Date(attempt.completedAt).toLocaleDateString()}
                                                 </span>
                                             </div>
                                             <div className="flex justify-between items-end">
                                                 <div>
                                                     <p className="text-xs text-gray-500 uppercase tracking-wide">Score</p>
-                                                    <p className="text-2xl font-bold text-indigo-600">{attempt.total_score}</p>
+                                                    <p className="text-2xl font-bold text-indigo-600">{attempt.totalScore}</p>
                                                 </div>
-                                                {attempt.is_flagged_crisis && (
+                                                {attempt.isFlaggedCrisis && (
                                                     <span className="px-2 py-1 bg-red-100 text-red-800 text-xs rounded-full font-medium">
                                                         Flagged
                                                     </span>

@@ -3,7 +3,8 @@ import { useState, useEffect } from 'react';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { useApp } from '../../lib/context';
-import { supabase } from '../../lib/supabaseClient';
+import { db } from '../../lib/firebaseClient';
+import { doc, updateDoc } from 'firebase/firestore';
 
 const ProfilePage = () => {
   const router = useRouter();
@@ -30,12 +31,10 @@ const ProfilePage = () => {
 
   useEffect(() => {
     if (user) {
-      setDisplayName(user.display_name || '');
-      setAvatarUrl(user.avatar_url || '');
-      setAgeGroup(user.age_group || '');
-      setTimezone(user.timezone || 'America/Chicago');
-      if (user.notification_preferences) setNotificationPreferences(user.notification_preferences);
-      if (user.privacy_settings) setPrivacySettings(user.privacy_settings);
+      // Firebase user might not have these custom fields directly, 
+      // they should come from our Firestore userProfile if we had it loaded here.
+      // For onboarding, we typically start fresh or load from Firestore.
+      setDisplayName(user.displayName || '');
     }
   }, [user]);
 
@@ -46,21 +45,17 @@ const ProfilePage = () => {
 
     try {
       const updatedData = {
-        display_name: displayName,
+        nickname: displayName,
         avatar_url: avatarUrl,
-        age_group: ageGroup,
+        ageGroup: ageGroup,
         timezone: timezone,
-        notification_preferences: notificationPreferences,
-        privacy_settings: privacySettings,
-        onboarding_complete: true,
+        notificationPreferences: notificationPreferences,
+        privacySettings: privacySettings,
+        onboardingComplete: true,
       };
 
-      const { error: updateError } = await supabase
-        .from('profiles')
-        .update(updatedData)
-        .eq('id', user.id);
-
-      if (updateError) throw updateError;
+      const userDocRef = doc(db, 'users', user.uid);
+      await updateDoc(userDocRef, updatedData);
 
       router.push('/onboarding/screening');
     } catch (err) {

@@ -1,9 +1,38 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
+import { db } from '../lib/firebaseClient';
+import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 
 export default function MissionPage() {
     const router = useRouter();
+    const [showModal, setShowModal] = useState(false);
+    const [email, setEmail] = useState('');
+    const [name, setName] = useState('');
+    const [status, setStatus] = useState('idle'); // idle, loading, success, error
+
+    const handleInvestorSubmit = async (e) => {
+        e.preventDefault();
+        setStatus('loading');
+        try {
+            await addDoc(collection(db, 'investor_leads'), {
+                name,
+                email,
+                createdAt: serverTimestamp(),
+                source: 'mission_page_modal',
+            });
+            setStatus('success');
+            setTimeout(() => {
+                setShowModal(false);
+                setStatus('idle');
+                setEmail('');
+                setName('');
+            }, 3000);
+        } catch (error) {
+            console.error('Error adding investor lead:', error);
+            setStatus('error');
+        }
+    };
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-teal-50 via-white to-blue-50 font-sans">
@@ -48,7 +77,9 @@ export default function MissionPage() {
                         </p>
 
                         <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
-                            <button className="bg-gradient-to-r from-teal-600 to-teal-500 hover:from-teal-700 hover:to-teal-600 text-white px-8 py-4 rounded-xl font-bold text-lg shadow-xl transition-all">
+                            <button 
+                                onClick={() => setShowModal(true)}
+                                className="bg-gradient-to-r from-teal-600 to-teal-500 hover:from-teal-700 hover:to-teal-600 text-white px-8 py-4 rounded-xl font-bold text-lg shadow-xl transition-all">
                                 Request Investment Deck
                             </button>
                             <button
@@ -470,7 +501,9 @@ export default function MissionPage() {
                         </div>
 
                         <div className="space-y-6">
-                            <button className="bg-white text-teal-700 px-12 py-5 rounded-xl font-bold text-xl shadow-2xl hover:shadow-3xl transition-all">
+                            <button 
+                                onClick={() => setShowModal(true)}
+                                className="bg-white text-teal-700 px-12 py-5 rounded-xl font-bold text-xl shadow-2xl hover:shadow-3xl transition-all">
                                 Schedule Investor Meeting
                             </button>
                             <p className="text-sm opacity-75">
@@ -494,6 +527,63 @@ export default function MissionPage() {
                         <p className="text-xs text-gray-500 mt-8">© 2026 PMAction. All rights reserved. HIPAA Compliant • GDPR Compliant</p>
                     </div>
                 </footer>
+
+                {/* Investor Lead Capture Modal */}
+                {showModal && (
+                    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-900/60 backdrop-blur-sm">
+                        <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-8 relative">
+                            <button 
+                                onClick={() => setShowModal(false)}
+                                className="absolute top-4 right-4 text-gray-400 hover:text-gray-900"
+                            >
+                                ✕
+                            </button>
+                            <h3 className="text-2xl font-bold text-gray-900 mb-2">Access the Deck</h3>
+                            <p className="text-gray-600 mb-6">Enter your details and our AI will immediately securely dispatch the Teaser Deck and NDA to your inbox.</p>
+                            
+                            {status === 'success' ? (
+                                <div className="bg-teal-50 text-teal-700 p-4 rounded-xl text-center font-bold border border-teal-200">
+                                    ✓ Submitted! Check your email shortly.
+                                </div>
+                            ) : (
+                                <form onSubmit={handleInvestorSubmit} className="space-y-4">
+                                    <div>
+                                        <label className="block text-sm font-semibold text-gray-700 mb-1">Full Name / Firm</label>
+                                        <input 
+                                            type="text" 
+                                            required
+                                            value={name}
+                                            onChange={(e) => setName(e.target.value)}
+                                            className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-teal-500 focus:border-transparent outline-none"
+                                            placeholder="Your Name"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-semibold text-gray-700 mb-1">Work Email</label>
+                                        <input 
+                                            type="email" 
+                                            required
+                                            value={email}
+                                            onChange={(e) => setEmail(e.target.value)}
+                                            className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-teal-500 focus:border-transparent outline-none"
+                                            placeholder="invest@firm.com"
+                                        />
+                                    </div>
+                                    {status === 'error' && (
+                                        <div className="text-red-500 text-sm font-semibold">An error occurred. Please try again or email us directly.</div>
+                                    )}
+                                    <button 
+                                        type="submit" 
+                                        disabled={status === 'loading'}
+                                        className="w-full bg-teal-600 text-white font-bold py-3 rounded-xl hover:bg-teal-700 transition disabled:opacity-50"
+                                    >
+                                        {status === 'loading' ? 'Processing...' : 'Request Access'}
+                                    </button>
+                                </form>
+                            )}
+                        </div>
+                    </div>
+                )}
             </main>
         </div>
     );

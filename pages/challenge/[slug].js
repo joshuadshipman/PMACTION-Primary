@@ -2,7 +2,21 @@ import React, { useState, useEffect } from 'react';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { useApp } from '../../lib/context';
-import { supabase } from '../../lib/supabaseClient';
+import { auth, db } from '../../lib/firebaseClient';
+import { 
+    collection, 
+    query, 
+    where, 
+    getDocs, 
+    getDoc, 
+    doc, 
+    setDoc, 
+    addDoc,
+    updateDoc, 
+    orderBy, 
+    limit, 
+    serverTimestamp 
+} from 'firebase/firestore';
 import ReactMarkdown from 'react-markdown';
 
 export default function ChallengeDetail() {
@@ -32,49 +46,50 @@ export default function ChallengeDetail() {
         try {
             setLoading(true);
 
-            // Fetch challenge details
-            const { data: challengeData, error: challengeError } = await supabase
-                .from('challenges')
-                .select('*')
-                .eq('slug', slug)
-                .single();
+            // 1. Fetch challenge details (Doc ID is slug per migration script)
+            const challengeRef = doc(db, 'challenges', slug);
+            const challengeSnap = await getDoc(challengeRef);
 
-            if (challengeError) throw challengeError;
-            setChallenge(challengeData);
-
-            // Fetch tasks
-            const { data: tasksData, error: tasksError } = await supabase
-                .from('challenge_tasks')
-                .select('*')
-                .eq('challenge_id', challengeData.id)
-                .order('day_number');
-
-            if (tasksError) throw tasksError;
-            setTasks(tasksData);
-
-            // Check if user joined
-            const { data: userChallengeData, error: userChallengeError } = await supabase
-                .from('user_challenges')
-                .select('*')
-                .eq('user_id', user.id)
-                .eq('challenge_id', challengeData.id)
-                .single();
-
-            if (userChallengeError && userChallengeError.code !== 'PGRST116') {
-                console.error('Error fetching user challenge:', userChallengeError);
+            if (!challengeSnap.exists()) {
+                console.error('Challenge not found');
+                setLoading(false);
+                return;
             }
 
-            setUserChallenge(userChallengeData);
+            const challengeData = { id: challengeSnap.id, ...challengeSnap.data() };
+            setChallenge(challengeData);
 
-            if (userChallengeData) {
-                // Fetch completions
-                const { data: completionsData, error: completionsError } = await supabase
-                    .from('challenge_completions')
-                    .select('*')
-                    .eq('user_challenge_id', userChallengeData.id);
+            // 2. Fetch tasks from subcollection
+            const tasksRef = collection(db, 'challenges', slug, 'tasks');
+            const tasksQ = query(tasksRef, orderBy('day'));
+            const tasksSnap = await getDocs(tasksQ);
+            const tasksData = tasksSnap.docs.map(doc => ({ id: doc.id, ...doc.data(), day_number: doc.data().day }));
+            setTasks(tasksData);
 
-                if (completionsError) throw completionsError;
-                setCompletions(completionsData || []);
+            // 3. Check if user joined
+            const userChallsRef = collection(db, 'user_challenges');
+            const qJoin = query(
+                userChallsRef,
+                where('userId', '==', user.uid),
+                where('challengeId', '==', slug),
+                limit(1)
+            );
+            const joinSnap = await getDocs(qJoin);
+
+            if (!joinSnap.empty) {
+                const userChallengeDoc = joinSnap.docs[0];
+                const userChallengeData = { id: userChallengeDoc.id, ...userChallengeDoc.data() };
+                setUserChallenge(userChallengeData);
+
+                // 4. Fetch completions (Top-level collection for simplicity)
+                const completionsRef = collection(db, 'challenge_completions');
+                const compQ = query(
+                    completionsRef,
+                    where('userId', '==', user.uid),
+                    where('challengeId', '==', slug)
+                );
+                const compSnap = await getDocs(compQ);
+                setCompletions(compSnap.docs.map(doc => ({ id: doc.id, ...doc.data() })) || []);
             }
 
         } catch (error) {
@@ -87,21 +102,17 @@ export default function ChallengeDetail() {
     const handleJoin = async () => {
         try {
             setJoining(true);
-            const { data, error } = await supabase
-                .from('user_challenges')
-                .insert([
-                    {
-                        user_id: user.id,
-                        challenge_id: challenge.id,
-                        status: 'active',
-                        start_date: new Date().toISOString()
-                    }
-                ])
-                .select()
-                .single();
+            const userChallsRef = collection(db, 'user_challenges');
+            const newDoc = {
+                userId: user.uid,
+                challengeId: slug,
+                status: 'active',
+                startDate: serverTimestamp(),
+                title: challenge.title
+            };
 
-            if (error) throw error;
-            setUserChallenge(data);
+            const docRef = await addDoc(userChallsRef, newDoc);
+            setUserChallenge({ id: docRef.id, ...newDoc });
             alert('You have successfully joined the challenge!');
         } catch (error) {
             console.error('Error joining challenge:', error);
@@ -115,39 +126,34 @@ export default function ChallengeDetail() {
         if (!userChallenge) return;
 
         try {
-            const isCompleted = completions.some(c => c.task_id === taskId);
+            // Find task to get day number
+            const task = tasks.find(t => t.id === taskId);
+            const isCompleted = completions.some(c => c.taskId === taskId);
 
-            if (isCompleted) {
-                // Optional: Allow un-completing? For now, let's just return or implement delete
-                return;
-            }
+            if (isCompleted) return;
 
-            const { data, error } = await supabase
-                .from('challenge_completions')
-                .insert([
-                    {
-                        user_challenge_id: userChallenge.id,
-                        task_id: taskId,
-                        day_completed: tasks.find(t => t.id === taskId)?.day_number,
-                        completed_at: new Date().toISOString()
-                    }
-                ])
-                .select()
-                .single();
+            const completionsRef = collection(db, 'challenge_completions');
+            const newComp = {
+                userId: user.uid,
+                challengeId: slug,
+                taskId: taskId,
+                dayCompleted: task?.day_number || 0,
+                completedAt: serverTimestamp()
+            };
 
-            if (error) throw error;
-
-            setCompletions([...completions, data]);
+            const docRef = await addDoc(completionsRef, newComp);
+            const updatedCompletions = [...completions, { id: docRef.id, ...newComp }];
+            setCompletions(updatedCompletions);
 
             // Check if all tasks completed
-            if (completions.length + 1 === tasks.length) {
-                await supabase
-                    .from('user_challenges')
-                    .update({ status: 'completed', completed_at: new Date().toISOString() })
-                    .eq('id', userChallenge.id);
+            if (updatedCompletions.length === tasks.length) {
+                const userChallRef = doc(db, 'user_challenges', userChallenge.id);
+                await updateDoc(userChallRef, { 
+                    status: 'completed', 
+                    completedAt: serverTimestamp() 
+                });
 
                 alert('Congratulations! You have completed the challenge!');
-                // Refresh to update status
                 fetchChallengeData();
             }
 
