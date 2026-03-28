@@ -1,164 +1,347 @@
 // pages/login.js
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { auth } from '../lib/firebaseClient';
-import { 
-  signInWithEmailAndPassword, 
-  createUserWithEmailAndPassword, 
-  signInWithPopup, 
-  GoogleAuthProvider 
+import {
+  RecaptchaVerifier,
+  signInWithPhoneNumber,
+  sendSignInLinkToEmail,
+  isSignInWithEmailLink,
+  signInWithEmailLink,
 } from 'firebase/auth';
 import { useApp } from '../lib/context';
+
+const ACTION_CODE_SETTINGS = {
+  url: `${process.env.NEXT_PUBLIC_APP_URL || 'https://www.pmaction.com'}/auth/verify-email`,
+  handleCodeInApp: true,
+};
+
+// ---------- Sub-components ----------
+
+const TabButton = ({ active, onClick, children }) => (
+  <button
+    onClick={onClick}
+    className={`flex-1 py-3 text-sm font-bold rounded-xl transition-all duration-200 ${
+      active
+        ? 'bg-white text-indigo-700 shadow-sm'
+        : 'text-indigo-300 hover:text-white'
+    }`}
+  >
+    {children}
+  </button>
+);
+
+const PhoneStep = ({ onSuccess }) => {
+  const [phone, setPhone] = useState('');
+  const [otp, setOtp] = useState(['', '', '', '', '', '']);
+  const [step, setStep] = useState('phone'); // 'phone' | 'otp'
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [confirmationResult, setConfirmationResult] = useState(null);
+  const recaptchaRef = useRef(null);
+  const inputRefs = useRef([]);
+
+  useEffect(() => {
+    // Setup invisible reCAPTCHA once on mount
+    if (!window.recaptchaVerifier) {
+      window.recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
+        size: 'invisible',
+        callback: () => {},
+      });
+    }
+    return () => {
+      // cleanup only on unmount
+    };
+  }, []);
+
+  const handleSendCode = async () => {
+    setError('');
+    const formattedPhone = phone.startsWith('+') ? phone : `+1${phone.replace(/\D/g, '')}`;
+    if (formattedPhone.replace(/\D/g, '').length < 11) {
+      setError('Please enter a valid US phone number.');
+      return;
+    }
+    setLoading(true);
+    try {
+      const confirmation = await signInWithPhoneNumber(
+        auth,
+        formattedPhone,
+        window.recaptchaVerifier
+      );
+      setConfirmationResult(confirmation);
+      setStep('otp');
+    } catch (err) {
+      setError('Failed to send code. Please check the number and try again.');
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleOtpChange = (value, index) => {
+    const newOtp = [...otp];
+    newOtp[index] = value.slice(-1);
+    setOtp(newOtp);
+    if (value && index < 5) {
+      inputRefs.current[index + 1]?.focus();
+    }
+  };
+
+  const handleOtpKeyDown = (e, index) => {
+    if (e.key === 'Backspace' && !otp[index] && index > 0) {
+      inputRefs.current[index - 1]?.focus();
+    }
+  };
+
+  const handleVerify = async () => {
+    const code = otp.join('');
+    if (code.length !== 6) { setError('Please enter all 6 digits.'); return; }
+    setLoading(true);
+    setError('');
+    try {
+      await confirmationResult.confirm(code);
+      onSuccess();
+    } catch (err) {
+      setError('Invalid code. Please try again.');
+      setOtp(['', '', '', '', '', '']);
+      inputRefs.current[0]?.focus();
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (step === 'otp') {
+    return (
+      <div className="space-y-6">
+        <div className="text-center">
+          <div className="text-4xl mb-3">📱</div>
+          <h3 className="text-white font-bold text-lg">Check your texts</h3>
+          <p className="text-indigo-200 text-sm mt-1">
+            We sent a 6-digit code to <span className="font-semibold text-white">{phone}</span>
+          </p>
+        </div>
+
+        <div className="flex gap-2 justify-center">
+          {otp.map((digit, i) => (
+            <input
+              key={i}
+              ref={el => inputRefs.current[i] = el}
+              type="number"
+              inputMode="numeric"
+              maxLength={1}
+              value={digit}
+              onChange={e => handleOtpChange(e.target.value, i)}
+              onKeyDown={e => handleOtpKeyDown(e, i)}
+              className="w-11 h-14 text-center text-2xl font-bold rounded-xl bg-white/10 border-2 border-white/20 text-white focus:border-indigo-300 focus:outline-none transition-all [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+              autoFocus={i === 0}
+            />
+          ))}
+        </div>
+
+        {error && <p className="text-red-300 text-sm text-center">{error}</p>}
+
+        <button
+          onClick={handleVerify}
+          disabled={loading || otp.join('').length < 6}
+          className="w-full py-4 rounded-2xl bg-white text-indigo-700 font-bold text-base shadow-lg hover:bg-indigo-50 transition-all disabled:opacity-40"
+        >
+          {loading ? 'Verifying...' : 'Verify & Continue →'}
+        </button>
+
+        <button
+          onClick={() => { setStep('phone'); setOtp(['', '', '', '', '', '']); setError(''); }}
+          className="w-full text-indigo-300 text-sm underline"
+        >
+          ← Change phone number
+        </button>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-5">
+      <div className="text-center">
+        <div className="text-4xl mb-3">📲</div>
+        <h3 className="text-white font-bold text-lg">Enter your phone number</h3>
+        <p className="text-indigo-200 text-sm mt-1">We'll send you a quick verification code — no password needed.</p>
+      </div>
+
+      <div className="flex items-center gap-2 bg-white/10 border border-white/20 rounded-2xl px-4 py-1 focus-within:border-indigo-300 transition-all">
+        <span className="text-white font-semibold text-base">🇺🇸 +1</span>
+        <div className="w-px h-6 bg-white/30" />
+        <input
+          type="tel"
+          inputMode="numeric"
+          placeholder="(555) 000-0000"
+          value={phone}
+          onChange={e => setPhone(e.target.value)}
+          onKeyDown={e => e.key === 'Enter' && handleSendCode()}
+          className="flex-1 bg-transparent text-white placeholder-indigo-300 text-base py-3 focus:outline-none"
+          autoFocus
+        />
+      </div>
+
+      {error && <p className="text-red-300 text-sm text-center">{error}</p>}
+
+      <button
+        onClick={handleSendCode}
+        disabled={loading || phone.replace(/\D/g, '').length < 10}
+        className="w-full py-4 rounded-2xl bg-white text-indigo-700 font-bold text-base shadow-lg hover:bg-indigo-50 transition-all disabled:opacity-40"
+      >
+        {loading ? 'Sending...' : 'Send Code →'}
+      </button>
+
+      <div id="recaptcha-container" />
+    </div>
+  );
+};
+
+const EmailStep = () => {
+  const [email, setEmail] = useState('');
+  const [sent, setSent] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+
+  const handleSendLink = async () => {
+    if (!email.includes('@')) { setError('Please enter a valid email.'); return; }
+    setLoading(true);
+    setError('');
+    try {
+      await sendSignInLinkToEmail(auth, email, ACTION_CODE_SETTINGS);
+      window.localStorage.setItem('pma_email_for_signin', email);
+      setSent(true);
+    } catch (err) {
+      setError('Failed to send link. Please try again.');
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (sent) {
+    return (
+      <div className="text-center space-y-4 py-4">
+        <div className="text-5xl">✉️</div>
+        <h3 className="text-white font-bold text-lg">Check your inbox!</h3>
+        <p className="text-indigo-200 text-sm">
+          We sent a magic sign-in link to<br />
+          <span className="font-semibold text-white">{email}</span>
+        </p>
+        <p className="text-indigo-300 text-xs">Tap it on your phone to log in instantly.</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-5">
+      <div className="text-center">
+        <div className="text-4xl mb-3">✉️</div>
+        <h3 className="text-white font-bold text-lg">Sign in with your email</h3>
+        <p className="text-indigo-200 text-sm mt-1">We'll email you a one-tap magic link — no password needed.</p>
+      </div>
+
+      <div className="bg-white/10 border border-white/20 rounded-2xl px-4 focus-within:border-indigo-300 transition-all">
+        <input
+          type="email"
+          inputMode="email"
+          placeholder="your@email.com"
+          value={email}
+          onChange={e => setEmail(e.target.value)}
+          onKeyDown={e => e.key === 'Enter' && handleSendLink()}
+          className="w-full bg-transparent text-white placeholder-indigo-300 text-base py-4 focus:outline-none"
+          autoFocus
+        />
+      </div>
+
+      {error && <p className="text-red-300 text-sm text-center">{error}</p>}
+
+      <button
+        onClick={handleSendLink}
+        disabled={loading || !email.includes('@')}
+        className="w-full py-4 rounded-2xl bg-white text-indigo-700 font-bold text-base shadow-lg hover:bg-indigo-50 transition-all disabled:opacity-40"
+      >
+        {loading ? 'Sending...' : 'Send Magic Link →'}
+      </button>
+    </div>
+  );
+};
+
+// ---------- Main Login Page ----------
 
 const LoginPage = () => {
   const router = useRouter();
   const { user } = useApp();
+  const [tab, setTab] = useState('phone'); // 'phone' | 'email'
+  const [checking, setChecking] = useState(true);
 
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [isSignUp, setIsSignUp] = useState(false);
-  const [error, setError] = useState(null);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-
+  // Redirect if already logged in
   useEffect(() => {
     if (user) {
-      // Direct redirect for now, profile-based logic can be added later
       router.push('/dashboard');
+    } else {
+      setChecking(false);
     }
   }, [user, router]);
 
-  const handleAuth = async (e) => {
-    e.preventDefault();
-    setError(null);
-    setIsSubmitting(true);
-
-    try {
-      if (isSignUp) {
-        await createUserWithEmailAndPassword(auth, email, password);
-        router.push('/onboarding/welcome');
-      } else {
-        await signInWithEmailAndPassword(auth, email, password);
-        // useEffect handles redirect
+  // Handle returning from email magic link
+  useEffect(() => {
+    if (isSignInWithEmailLink(auth, window.location.href)) {
+      let email = window.localStorage.getItem('pma_email_for_signin');
+      if (!email) {
+        email = window.prompt('Please confirm your email to complete sign-in:');
       }
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setIsSubmitting(false);
+      signInWithEmailLink(auth, email, window.location.href)
+        .then(() => {
+          window.localStorage.removeItem('pma_email_for_signin');
+          router.push('/dashboard');
+        })
+        .catch(err => console.error('Email link sign-in error:', err));
     }
-  };
+  }, []);
 
-  const handleGoogleSignIn = async () => {
-    try {
-      const provider = new GoogleAuthProvider();
-      await signInWithPopup(auth, provider);
-    } catch (err) {
-      setError(err.message);
-    }
-  };
+  if (checking) return null;
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+    <>
       <Head>
-        <title>{isSignUp ? 'Sign Up' : 'Login'} | PMAction</title>
-        <meta name="description" content="Access your PMAction account" />
+        <title>Sign In | PMAction</title>
+        <meta name="description" content="Sign in to your PMAction account — no password needed." />
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
       </Head>
 
-      <div className="max-w-md w-full space-y-8 bg-white p-8 rounded-lg shadow-md">
-        <div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-            {isSignUp ? 'Create your account' : 'Sign in to your account'}
-          </h2>
-          <p className="mt-2 text-center text-sm text-gray-600">
-            {isSignUp ? 'Start your journey with us' : 'Welcome back'}
-          </p>
+      <div className="min-h-screen bg-gradient-to-br from-indigo-900 via-purple-900 to-indigo-800 flex flex-col items-center justify-center p-5">
+        {/* Logo / Brand */}
+        <div className="text-center mb-8">
+          <div className="text-5xl mb-3">🧠</div>
+          <h1 className="text-white text-3xl font-black tracking-tight">PMAction</h1>
+          <p className="text-indigo-300 text-sm mt-1">Your daily positive action companion</p>
         </div>
 
-        {error && (
-          <div className="bg-red-50 border-l-4 border-red-400 p-4">
-            <div className="flex">
-              <div className="ml-3">
-                <p className="text-sm text-red-700">{error}</p>
-              </div>
-            </div>
-          </div>
-        )}
-
-        <form className="mt-8 space-y-6" onSubmit={handleAuth}>
-          <div className="rounded-md shadow-sm -space-y-px">
-            <div>
-              <label htmlFor="email-address" className="sr-only">Email address</label>
-              <input
-                id="email-address"
-                name="email"
-                type="email"
-                autoComplete="email"
-                required
-                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-teal-500 focus:border-teal-500 focus:z-10 sm:text-sm"
-                placeholder="Email address"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-              />
-            </div>
-            <div>
-              <label htmlFor="password" className="sr-only">Password</label>
-              <input
-                id="password"
-                name="password"
-                type="password"
-                autoComplete="current-password"
-                required
-                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-teal-500 focus:border-teal-500 focus:z-10 sm:text-sm"
-                placeholder="Password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-              />
-            </div>
+        {/* Card */}
+        <div className="w-full max-w-sm bg-white/10 backdrop-blur-md rounded-3xl p-6 shadow-2xl border border-white/20">
+          {/* Tab switcher */}
+          <div className="flex gap-1 bg-white/10 rounded-2xl p-1 mb-6">
+            <TabButton active={tab === 'phone'} onClick={() => setTab('phone')}>📱 Phone</TabButton>
+            <TabButton active={tab === 'email'} onClick={() => setTab('email')}>✉️ Email</TabButton>
           </div>
 
-          <div>
-            <button
-              type="submit"
-              disabled={isSubmitting}
-              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-teal-600 hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500 disabled:opacity-50"
-            >
-              {isSubmitting ? 'Processing...' : (isSignUp ? 'Sign up' : 'Sign in')}
-            </button>
-          </div>
-        </form>
-
-        <div className="mt-6">
-          <div className="relative">
-            <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-gray-300" />
-            </div>
-            <div className="relative flex justify-center text-sm">
-              <span className="px-2 bg-white text-gray-500">Or continue with</span>
-            </div>
-          </div>
-
-          <div className="mt-6">
-            <button
-              onClick={handleGoogleSignIn}
-              className="w-full flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-500 hover:bg-gray-50"
-            >
-              <img className="h-5 w-5 mr-2" src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google logo" />
-              Sign in with Google
-            </button>
-          </div>
+          {/* Auth flow */}
+          {tab === 'phone' ? (
+            <PhoneStep onSuccess={() => router.push('/dashboard')} />
+          ) : (
+            <EmailStep />
+          )}
         </div>
 
-        <div className="text-center mt-4">
-          <button
-            type="button"
-            className="text-sm text-teal-600 hover:text-teal-500"
-            onClick={() => setIsSignUp(!isSignUp)}
-          >
-            {isSignUp ? 'Already have an account? Sign in' : "Don't have an account? Sign up"}
-          </button>
-        </div>
+        {/* Footer note */}
+        <p className="text-indigo-400 text-xs text-center mt-6 max-w-xs">
+          By continuing, you agree to our{' '}
+          <a href="/terms" className="underline hover:text-white">Terms</a> and{' '}
+          <a href="/privacy" className="underline hover:text-white">Privacy Policy</a>.
+        </p>
       </div>
-    </div>
+    </>
   );
 };
 

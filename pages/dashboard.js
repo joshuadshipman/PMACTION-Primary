@@ -1,5 +1,6 @@
 import { useApp } from '../lib/context';
 import { auth, db } from '../lib/firebaseClient';
+import { useRouter } from 'next/router';
 import { signOut } from 'firebase/auth';
 import { collection, query, where, orderBy, limit, getDocs } from 'firebase/firestore';
 import { motion } from 'framer-motion';
