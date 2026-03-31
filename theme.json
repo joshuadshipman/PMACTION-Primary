@@ -1,0 +1,57 @@
+{
+  "name": "PMAction Platform: Global Brand System",
+  "version": "1.0.0",
+  "author": "GravityClaw Hub",
+  "tokens": {
+    "colors": {
+      "brand": {
+        "primary": "#0d9488",
+        "secondary": "#a3e635",
+        "accent": "#fb7185",
+        "dark": "#0f172a",
+        "surface": "#ffffff",
+        "surface-muted": "#f0fdfa"
+      },
+      "status": {
+        "success": "#a3e635",
+        "error": "#fb7185",
+        "warning": "#fbbf24",
+        "info": "#2196F3",
+        "alert-success": "#4CAF50",
+        "alert-warning": "#FF9800",
+        "alert-error": "#f44336"
+      },
+      "hero": {
+        "start": "#667eea",
+        "end": "#764ba2",
+        "mint-start": "#f093fb",
+        "mint-end": "#4facfe",
+        "teal-start": "#00f2fe",
+        "teal-end": "#ccfbf1"
+      },
+      "neutral": {
+        "light": "#f5f5f5",
+        "medium": "#555555",
+        "dark": "#333333",
+        "dark-short": "#333",
+        "grey": "#555",
+        "bg-soft": "#f5f7fa",
+        "bg-muted": "#c3cfe2",
+        "slate-low": "#f3f4f6",
+        "ice": "#e0e5ec",
+        "chart-green": "#16a34a",
+        "chart-orange": "#f97316",
+        "teal-brand": "#14b8a6",
+        "teal-light": "#ccfbf1"
+      }
+    },
+    "spacing": {
+      "base": 4,
+      "scale": [0, 4, 8, 16, 24, 32, 64]
+    },
+    "typography": {
+      "display": "Outfit, sans-serif",
+      "body": "Inter, sans-serif"
+    }
+  }
+}
