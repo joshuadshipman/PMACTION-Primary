@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PMP Master Training — 30 Day Exam Prep System</title>
+    <meta name="description" content="Pass the PMP exam in 30 days with bite-sized lessons, quizzes, and progress tracking. Built by project managers, for project managers.">
+    <meta name="keywords" content="PMP, PMP exam, PMP prep, project management, PMBOK, PMP certification, exam prep">
+    <meta property="og:title" content="PMP Master Training — 30 Day System">
+    <meta property="og:description" content="The $67 PMP prep course that rivals $400 bootcamps. 30 days. 100+ quiz questions. Zero fluff.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box}
+        body{font-family:'Inter',system-ui,sans-serif;background:#0f0a1e;color:#e2e8f0;min-height:100vh;overflow-x:hidden}
+        ::-webkit-scrollbar{width:6px}::-webkit-scrollbar-track{background:#1a1333}::-webkit-scrollbar-thumb{background:#6366f1;border-radius:3px}
+        .grad-bg{background:linear-gradient(135deg,#0f0a1e 0%,#1e1145 50%,#0f0a1e 100%)}
+        .glass{background:rgba(255,255,255,0.05);backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,0.1);border-radius:20px}
+        .glass-strong{background:rgba(255,255,255,0.08);backdrop-filter:blur(30px);border:1px solid rgba(255,255,255,0.15);border-radius:24px}
+        .btn{padding:14px 32px;border:none;border-radius:50px;font-weight:700;font-size:1rem;cursor:pointer;transition:all .3s;display:inline-flex;align-items:center;gap:8px}
+        .btn-primary{background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff;box-shadow:0 4px 20px rgba(99,102,241,.4)}
+        .btn-primary:hover{transform:translateY(-2px);box-shadow:0 8px 30px rgba(99,102,241,.6)}
+        .btn-success{background:linear-gradient(135deg,#10b981,#059669);color:#fff;box-shadow:0 4px 20px rgba(16,185,129,.4)}
+        .btn-success:hover{transform:translateY(-2px);box-shadow:0 8px 30px rgba(16,185,129,.6)}
+        .btn-ghost{background:transparent;border:2px solid rgba(255,255,255,.2);color:#e2e8f0}
+        .btn-ghost:hover{border-color:#6366f1;background:rgba(99,102,241,.1)}
+        .btn-block{width:100%;justify-content:center;padding:18px;font-size:1.1rem}
+        .badge{display:inline-block;padding:6px 14px;border-radius:50px;font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em}
+        .badge-purple{background:rgba(99,102,241,.2);color:#a5b4fc;border:1px solid rgba(99,102,241,.3)}
+        .badge-green{background:rgba(16,185,129,.2);color:#6ee7b7;border:1px solid rgba(16,185,129,.3)}
+        .badge-amber{background:rgba(245,158,11,.2);color:#fcd34d;border:1px solid rgba(245,158,11,.3)}
+        .progress-bar{height:8px;background:rgba(255,255,255,.1);border-radius:50px;overflow:hidden}
+        .progress-fill{height:100%;border-radius:50px;background:linear-gradient(90deg,#6366f1,#8b5cf6,#a78bfa);transition:width 1s ease}
+        .card{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:24px;transition:all .3s}
+        .card:hover{border-color:rgba(99,102,241,.3);transform:translateY(-2px)}
+        .container{max-width:900px;margin:0 auto;padding:20px}
+        .grid-2{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
+        .grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+        .text-gradient{background:linear-gradient(135deg,#6366f1,#a78bfa,#c084fc);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+        .text-gradient-warm{background:linear-gradient(135deg,#f59e0b,#ef4444);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+        .lesson-box{background:#fff;color:#1e293b;border-radius:20px;padding:32px;max-height:500px;overflow-y:auto;line-height:1.7}
+        .lesson-box h3{font-size:1.25rem;font-weight:800;margin:20px 0 12px;color:#1e1145}
+        .lesson-box .tip{background:#fef3c7;border-left:4px solid #f59e0b;padding:12px 16px;border-radius:0 8px 8px 0;margin:12px 0;font-size:.9rem}
+        .lesson-box .concept{border-left:4px solid;padding:10px 16px;border-radius:0 8px 8px 0;margin:8px 0;font-size:.9rem;background:#f8fafc}
+        .quiz-opt{width:100%;text-align:left;padding:16px 20px;border-radius:12px;border:2px solid rgba(255,255,255,.15);background:rgba(255,255,255,.05);color:#e2e8f0;font-size:1rem;cursor:pointer;transition:all .2s;margin-bottom:8px}
+        .quiz-opt:hover{border-color:#6366f1;background:rgba(99,102,241,.1)}
+        .quiz-opt.selected{border-color:#6366f1;background:rgba(99,102,241,.15)}
+        .quiz-opt.correct{border-color:#10b981;background:rgba(16,185,129,.15);color:#6ee7b7}
+        .quiz-opt.wrong{border-color:#ef4444;background:rgba(239,68,68,.15);color:#fca5a5}
+        .day-btn{aspect-ratio:1;border-radius:14px;font-weight:800;font-size:1rem;display:flex;align-items:center;justify-content:center;cursor:pointer;border:none;transition:all .2s}
+        .day-done{background:linear-gradient(135deg,#10b981,#059669);color:#fff}
+        .day-current{background:#6366f1;color:#fff;box-shadow:0 0 20px rgba(99,102,241,.5);animation:pulse 2s infinite}
+        .day-locked{background:rgba(255,255,255,.05);color:rgba(255,255,255,.3);cursor:not-allowed}
+        .day-open{background:rgba(255,255,255,.08);color:#e2e8f0}
+        .day-open:hover{background:rgba(99,102,241,.2);border-color:rgba(99,102,241,.3)}
+        .hero-glow{position:absolute;width:600px;height:600px;border-radius:50%;filter:blur(150px);opacity:.15;pointer-events:none}
+        @keyframes pulse{0%,100%{box-shadow:0 0 20px rgba(99,102,241,.5)}50%{box-shadow:0 0 40px rgba(99,102,241,.8)}}
+        @keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+        .fade-up{animation:fadeUp .5s ease forwards}
+        @media(max-width:640px){.grid-2{grid-template-columns:1fr}.grid-3{grid-template-columns:repeat(3,1fr)}.container{padding:12px}.lesson-box{padding:20px}}
+        .locked-overlay{position:relative}.locked-overlay::after{content:'🔒 Unlock Full Access — $67';position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(15,10,30,.92);backdrop-filter:blur(8px);border-radius:20px;font-size:1.2rem;font-weight:700;color:#a78bfa;cursor:pointer}
+        .cert-border{border:4px double #a78bfa;padding:40px;text-align:center;border-radius:24px;background:rgba(99,102,241,.05)}
+    </style>
+</head>
+<body class="grad-bg">
+<div id="app"></div>
+<script>
+// ═══════════════════════ STATE ═══════════════════════
+function load(){try{const s=localStorage.getItem('pmpMaster');if(s)return JSON.parse(s)}catch(e){}return{view:'landing',currentDay:1,completedDays:[],scores:{},xp:0,unlocked:false,name:''}}
+function save(){try{localStorage.setItem('pmpMaster',JSON.stringify(S))}catch(e){}}
+let S=load(),Q={q:0,ans:null,show:false};
+const FREE_DAYS=[1,2,3];
+
+// ═══════════════════════ CURRICULUM ═══════════════════════
+const C={
+1:{title:"Conflict Resolution & Leadership Styles",domain:"People",weight:"8-10 Qs",xp:150,
+lesson:`<div class="tip">🎯 <b>High-Value Topic!</b> Conflict resolution accounts for 8-10 exam questions. Master this = guaranteed points.</div>
+<h3>The 5 Conflict Resolution Methods</h3>
+<div class="concept" style="border-color:#22c55e"><b>1. COLLABORATE (Win-Win)</b><br>Both parties work together to find a <em>new</em> solution that fully satisfies everyone. Takes the most time but yields the best results.<br><span style="color:#dc2626">⚠️ This is NOT the same as Compromise!</span></div>
+<div class="concept" style="border-color:#3b82f6"><b>2. COMPROMISE (Lose-Lose)</b><br>Both parties give up something. Neither is fully satisfied. Quick but suboptimal.<br><span style="color:#dc2626">⚠️ Most common exam trap — students confuse this with Collaborate!</span></div>
+<div class="concept" style="border-color:#a855f7"><b>3. SMOOTH / ACCOMMODATE (Yield)</b><br>Emphasize areas of agreement, downplay differences. Temporary fix. One party yields to the other.</div>
+<div class="concept" style="border-color:#f97316"><b>4. FORCE / DIRECT (Win-Lose)</b><br>PM makes the decision. Use ONLY in emergencies or when authority is needed immediately.</div>
+<div class="concept" style="border-color:#ef4444"><b>5. WITHDRAW / AVOID (Retreat)</b><br>Walk away, postpone the issue. Worst option — conflict remains unresolved.</div>
+<h3>Tuckman's Team Development Model</h3>
+<div class="concept" style="border-color:#3b82f6"><b>FORMING</b> → PM is <em>directive</em>. Create team charter and ground rules.</div>
+<div class="concept" style="border-color:#ef4444"><b>STORMING</b> → PM must <em>FACILITATE</em>. This is where 40%+ of People questions come from!</div>
+<div class="concept" style="border-color:#22c55e"><b>NORMING</b> → PM <em>empowers</em> the team. Trust is building.</div>
+<div class="concept" style="border-color:#a855f7"><b>PERFORMING</b> → PM <em>delegates</em>. Team is self-managing.</div>
+<div class="concept" style="border-color:#64748b"><b>ADJOURNING</b> → Project closeout. Celebrate and capture lessons learned.</div>
+<div class="tip">💡 <b>Exam Key:</b> PMI always prefers Collaborate first. If the question says "limited time," then Compromise. Force is only for emergencies.</div>`,
+quiz:[
+{q:"Your team is in the Storming phase. Two developers are in conflict about the architecture. One wants to escalate to the sponsor. As a Servant Leader, what should you do FIRST?",
+opts:["Escalate to the project sponsor","Facilitate a meeting between the developers","Make the architecture decision yourself","Tell them to resolve it on their own"],ans:1,
+exp:"Servant Leaders FACILITATE. During Storming, the PM's role is to help the team resolve conflicts themselves — not escalate, decide, or withdraw.",hint:"What does a Servant Leader do? Serve the team by facilitating."},
+{q:"What is the PRIMARY difference between Collaborate and Compromise?",
+opts:["Collaborate is faster than Compromise","In Compromise, both parties give up something; in Collaborate, a new solution satisfies both","Collaborate requires management approval","They are the same thing"],ans:1,
+exp:"Collaborate = Win-Win (new solution). Compromise = Lose-Lose (both sacrifice). This is the #1 trap on the exam.",hint:"Think about what each party 'gives up' in each method."},
+{q:"A critical production issue requires an immediate decision. Two team members disagree on the fix. What conflict resolution method is MOST appropriate?",
+opts:["Withdraw until tomorrow","Smooth over the disagreement","Force/Direct — PM decides","Collaborate on a new solution"],ans:2,
+exp:"In emergencies requiring immediate action, Force/Direct is appropriate. The PM uses authority to make the call.",hint:"Time pressure changes the 'best' answer. What's appropriate in an emergency?"},
+{q:"During which Tuckman stage does the PM need to be MOST hands-on with facilitation?",
+opts:["Forming","Storming","Norming","Performing"],ans:1,
+exp:"Storming is where conflicts emerge. The PM must actively facilitate resolution and guide the team through disagreements.",hint:"When does a team fight the most?"}
+]},
+
+2:{title:"Team Building, Charters & Training",domain:"People",weight:"6-8 Qs",xp:150,
+lesson:`<h3>Team Charter</h3>
+<div class="concept" style="border-color:#3b82f6"><b>What It Contains:</b><br>• Ground Rules — meeting protocols, decision-making process<br>• Team Values — quality, collaboration, respect<br>• Communication Norms — response times, preferred channels<br>• Working Agreements — core hours, tools, escalation paths<br>• Conflict Resolution Process — agreed method for handling disputes</div>
+<div class="tip">🎯 The Team Charter is created during <b>FORMING</b> with the team's involvement — never imposed top-down!</div>
+<h3>Training & Development</h3>
+<div class="concept" style="border-color:#22c55e"><b>Types of Training:</b><br>• <b>Cross-training</b> — team members learn each other's skills (reduces bus factor)<br>• <b>Coaching</b> — one-on-one development, PM helps individuals grow<br>• <b>Mentoring</b> — senior guides junior (longer-term relationship)<br>• <b>Co-location</b> — physical proximity improves communication (also called "war room")</div>
+<h3>Team Performance Assessments</h3>
+<p>PMs evaluate team effectiveness using:</p>
+<div class="concept" style="border-color:#f97316">• Skills gap analysis<br>• 360-degree feedback<br>• Team velocity / throughput metrics<br>• Retrospectives and lessons learned</div>
+<div class="tip">💡 <b>Exam Key:</b> PMI loves questions about co-location and cross-training. Co-location is the BEST way to improve communication. Cross-training reduces risk.</div>`,
+quiz:[
+{q:"When should the Team Charter be created?",
+opts:["After the team has worked together for several weeks","During Forming, with the team's involvement","Only if conflicts arise during Storming","When the project sponsor requests it"],ans:1,
+exp:"The Team Charter is created during FORMING with the full team. It sets expectations early before conflicts emerge.",hint:"Prevention is better than cure. When should rules be established?"},
+{q:"What is the BEST way to improve communication on a project?",
+opts:["Send more emails","Add more status meetings","Co-locate the team","Create a communication plan"],ans:2,
+exp:"Co-location (placing team in the same physical space) is PMI's preferred answer for improving communication.",hint:"Think about proximity and informal communication."},
+{q:"A team member lacks a critical skill needed for the next sprint. What should the PM do FIRST?",
+opts:["Replace the team member","Provide training or coaching","Escalate to the functional manager","Reassign the work to someone else"],ans:1,
+exp:"PMI favors developing people. Training/coaching is always preferred over replacement or reassignment.",hint:"What would a servant leader do for the team member?"}
+]},
+
+3:{title:"Motivation Theories & Team Performance",domain:"People",weight:"5-7 Qs",xp:150,
+lesson:`<h3>Maslow's Hierarchy of Needs</h3>
+<div class="concept" style="border-color:#6366f1">From bottom to top:<br>1. <b>Physiological</b> — food, water, shelter (salary, working conditions)<br>2. <b>Safety</b> — job security, health insurance, safe environment<br>3. <b>Social/Belonging</b> — team relationships, feeling accepted<br>4. <b>Esteem</b> — recognition, respect, achievement<br>5. <b>Self-Actualization</b> — growth, reaching full potential, challenging work</div>
+<div class="tip">🎯 <b>Exam Key:</b> Lower needs must be met FIRST. You can't motivate someone with recognition (Level 4) if they're worried about job security (Level 2).</div>
+<h3>Herzberg's Two-Factor Theory</h3>
+<div class="concept" style="border-color:#22c55e"><b>Hygiene Factors</b> (prevent dissatisfaction):<br>Salary, working conditions, job security, company policies, relationships<br><em>Having these doesn't motivate — but lacking them causes dissatisfaction!</em></div>
+<div class="concept" style="border-color:#f97316"><b>Motivators</b> (create satisfaction):<br>Achievement, recognition, responsibility, growth, the work itself<br><em>These actually drive motivation and engagement.</em></div>
+<h3>McGregor's Theory X vs Theory Y</h3>
+<div class="concept" style="border-color:#ef4444"><b>Theory X:</b> People are lazy, need to be forced/controlled. (Authoritarian management)</div>
+<div class="concept" style="border-color:#22c55e"><b>Theory Y:</b> People are self-motivated, seek responsibility. (Participative management)<br><span style="color:#16a34a">✅ PMI ALWAYS prefers Theory Y!</span></div>
+<h3>McClelland's Acquired Needs Theory</h3>
+<div class="concept" style="border-color:#a855f7">• <b>Achievement</b> — driven by challenging goals, feedback<br>• <b>Affiliation</b> — driven by relationships and belonging<br>• <b>Power</b> — driven by influence and control<br>People are a mix, but one need usually dominates.</div>`,
+quiz:[
+{q:"A developer is performing well but complains about poor office conditions. According to Herzberg, fixing the office is addressing a:",
+opts:["Motivator","Hygiene Factor","Self-Actualization need","Theory Y principle"],ans:1,
+exp:"Working conditions are Hygiene Factors. Fixing them prevents dissatisfaction but won't increase motivation.",hint:"Herzberg split things into two buckets. Which bucket is 'office conditions'?"},
+{q:"According to McGregor, a PM who believes team members need constant supervision follows:",
+opts:["Theory Y","Theory Z","Theory X","Maslow's hierarchy"],ans:2,
+exp:"Theory X = people are lazy and need control. Theory Y = people are self-motivated. PMI prefers Theory Y.",hint:"X = eXternal control needed. Y = Yes, they'll do it themselves."},
+{q:"A team member has job security and good pay but still seems unmotivated. According to Maslow, what level should the PM target?",
+opts:["Physiological","Safety","Social/Belonging or Esteem","Repeat salary increase"],ans:2,
+exp:"With lower needs met (salary=Physiological, security=Safety), target Social (team bonding) or Esteem (recognition).",hint:"Move UP the pyramid when lower levels are satisfied."},
+{q:"What is the BEST way to motivate a high-performing team according to PMI?",
+opts:["Increase their salaries","Give them challenging, meaningful work","Add more oversight to maintain quality","Promise bonuses for early delivery"],ans:1,
+exp:"PMI values intrinsic motivation. Challenging work = Self-Actualization (Maslow) and a Motivator (Herzberg).",hint:"PMI loves intrinsic over extrinsic motivation."}
+]},
+
+4:{title:"Stakeholder Engagement & Management",domain:"People",weight:"8-10 Qs",xp:175,
+lesson:`<h3>Stakeholder Identification</h3>
+<div class="tip">🎯 <b>Critical Topic!</b> Stakeholder engagement is tested heavily — expect 8-10 questions.</div>
+<div class="concept" style="border-color:#3b82f6"><b>Key Stakeholders:</b><br>• Project Sponsor — champion, funding, escalation path<br>• Customer/End User — defines requirements and acceptance<br>• Functional Managers — provide resources<br>• PMO — governance, standards, templates<br>• Team Members — execute the work</div>
+<h3>Stakeholder Analysis Tools</h3>
+<div class="concept" style="border-color:#6366f1"><b>Power/Interest Grid:</b><br>• High Power, High Interest → <b>Manage Closely</b><br>• High Power, Low Interest → <b>Keep Satisfied</b><br>• Low Power, High Interest → <b>Keep Informed</b><br>• Low Power, Low Interest → <b>Monitor</b></div>
+<div class="concept" style="border-color:#22c55e"><b>Salience Model:</b> Classifies stakeholders by Power, Legitimacy, and Urgency. Stakeholders with all three are "Definitive" and get top priority.</div>
+<h3>Engagement Levels</h3>
+<div class="concept" style="border-color:#f97316"><b>C-U-N-S-L Framework:</b><br>• <b>Unaware</b> — doesn't know about the project<br>• <b>Resistant</b> — aware but opposed<br>• <b>Neutral</b> — aware but indifferent<br>• <b>Supportive</b> — aware and helpful<br>• <b>Leading</b> — actively engaged and driving success</div>
+<div class="tip">💡 The PM's job is to move stakeholders toward <b>Supportive</b> or <b>Leading</b>. Document current vs. desired state in the Stakeholder Engagement Assessment Matrix.</div>`,
+quiz:[
+{q:"A powerful executive shows little interest in your project. According to the Power/Interest Grid, you should:",
+opts:["Manage Closely","Keep Satisfied","Keep Informed","Monitor"],ans:1,
+exp:"High Power + Low Interest = Keep Satisfied. Don't overwhelm them with details, but ensure they remain supportive.",hint:"Think about what happens if this person becomes unhappy."},
+{q:"A key stakeholder is Resistant to the project changes. What should the PM do FIRST?",
+opts:["Escalate to the sponsor","Understand their concerns and engage them","Remove them from the stakeholder register","Ignore them — they'll come around"],ans:1,
+exp:"Always understand concerns first. Engagement and communication can move Resistant to Neutral or Supportive.",hint:"PMI emphasizes understanding before acting."},
+{q:"When should stakeholder identification be performed?",
+opts:["Only at project start","Only during Planning","Continuously throughout the project","Only when conflicts arise"],ans:2,
+exp:"Stakeholder identification is ongoing. New stakeholders can emerge at any phase.",hint:"Projects change. Do the people involved stay the same?"},
+{q:"The Stakeholder Engagement Assessment Matrix shows a gap between 'Current' and 'Desired' engagement. What should the PM create?",
+opts:["A risk register entry","A stakeholder engagement plan with targeted strategies","A change request","A new project charter"],ans:1,
+exp:"The gap between current and desired engagement drives the strategies in the Stakeholder Engagement Plan.",hint:"You see a gap. What document addresses strategies to close it?"}
+]},
+
+5:{title:"Emotional Intelligence & Interpersonal Skills",domain:"People",weight:"4-6 Qs",xp:150,
+lesson:`<h3>Emotional Intelligence (EQ)</h3>
+<div class="concept" style="border-color:#6366f1"><b>Daniel Goleman's 5 Components:</b><br>1. <b>Self-Awareness</b> — recognizing your own emotions and their effect<br>2. <b>Self-Regulation</b> — controlling impulses, thinking before acting<br>3. <b>Motivation</b> — inner drive beyond money or status<br>4. <b>Empathy</b> — understanding others' emotions (NOT sympathy)<br>5. <b>Social Skills</b> — managing relationships, building networks</div>
+<div class="tip">🎯 PMI considers EQ more important than IQ for project managers. Expect 4-6 questions on applying EQ in scenarios.</div>
+<h3>Key Interpersonal Skills</h3>
+<div class="concept" style="border-color:#22c55e"><b>Active Listening:</b> Fully concentrating on the speaker. Involves paraphrasing, asking clarifying questions, and observing body language. PMI's #1 communication skill.</div>
+<div class="concept" style="border-color:#f97316"><b>Negotiation:</b><br>• Best outcome = Win-Win (same as Collaborate in conflict)<br>• Know your BATNA (Best Alternative to a Negotiated Agreement)<br>• Separate people from the problem<br>• Focus on interests, not positions</div>
+<div class="concept" style="border-color:#a855f7"><b>Cultural Intelligence:</b> Understanding and respecting cultural differences in global teams. Communication styles, decision-making norms, and concepts of time vary across cultures.</div>
+<div class="tip">💡 <b>Exam Key:</b> When a question mentions "misunderstanding" or "communication breakdown," the answer often involves Active Listening or Empathy.</div>`,
+quiz:[
+{q:"A team member seems disengaged. They complete tasks but avoid discussions. What EQ component should the PM apply FIRST?",
+opts:["Self-Regulation","Motivation","Empathy — try to understand their perspective","Social Skills — force interaction"],ans:2,
+exp:"Empathy first. Understand WHY they're disengaged before trying to fix it. Maybe they're dealing with personal issues.",hint:"Before solving, you need to understand."},
+{q:"During a negotiation with a vendor, the PM should focus on:",
+opts:["Winning at all costs","Positions — what each side demands","Interests — what each side actually needs","Threatening to switch vendors"],ans:2,
+exp:"Interest-based negotiation leads to Win-Win outcomes. Positions are what people SAY they want; interests are WHY they want it.",hint:"Fisher & Ury's 'Getting to Yes' — focus on WHY, not WHAT."},
+{q:"What is the PRIMARY benefit of Active Listening?",
+opts:["It saves time in meetings","It ensures the listener truly understands the speaker's message","It shows dominance in conversation","It eliminates the need for written communication"],ans:1,
+exp:"Active Listening ensures accurate understanding and builds trust. It includes paraphrasing, clarifying, and observing nonverbal cues.",hint:"What does 'active' add beyond just hearing?"}
+]},
+
+6:{title:"Servant Leadership & Agile Team Dynamics",domain:"People",weight:"6-8 Qs",xp:175,
+lesson:`<h3>Servant Leadership</h3>
+<div class="tip">🎯 PMI has heavily shifted toward Servant Leadership. Expect 6-8 questions. The old "command and control" PM is dead.</div>
+<div class="concept" style="border-color:#6366f1"><b>Core Principles:</b><br>• <b>Serve the team</b> — remove impediments, provide resources<br>• <b>Empower</b> — trust the team to make decisions<br>• <b>Facilitate</b> — guide discussions, don't dictate<br>• <b>Shield</b> — protect the team from organizational politics<br>• <b>Develop</b> — grow people, not just deliverables</div>
+<h3>Agile Team Dynamics</h3>
+<div class="concept" style="border-color:#22c55e"><b>Self-Organizing Teams:</b><br>• Team decides HOW to do the work (PM sets the WHAT and WHY)<br>• Cross-functional — all skills needed are within the team<br>• Ideal size: 5-9 members (Scrum: 3-9 developers)<br>• Dedicated — 100% allocation is preferred</div>
+<div class="concept" style="border-color:#f97316"><b>Scrum Roles:</b><br>• <b>Product Owner</b> — maximizes value, manages backlog, represents stakeholders<br>• <b>Scrum Master</b> — servant leader, removes impediments, facilitates ceremonies<br>• <b>Development Team</b> — self-organizing, cross-functional, delivers increment</div>
+<h3>Agile vs Traditional PM Role</h3>
+<div class="concept" style="border-color:#a855f7"><b>Traditional PM:</b> Plans, directs, controls, assigns tasks<br><b>Agile PM / Scrum Master:</b> Facilitates, coaches, removes blockers, serves the team<br><br>The #1 trap: exam gives a scenario where old-school PM behavior is an option. PMI wants you to choose the servant leader approach.</div>`,
+quiz:[
+{q:"The development team is struggling to meet sprint commitments. As Scrum Master, what should you do?",
+opts:["Assign tasks to specific team members","Add more team members to increase velocity","Facilitate a retrospective to identify root causes","Report the team's poor performance to management"],ans:2,
+exp:"Servant leaders facilitate — help the team find and solve their own problems through retrospectives.",hint:"What does a Scrum Master DO when the team struggles?"},
+{q:"A stakeholder keeps adding requirements mid-sprint. The Scrum Master should:",
+opts:["Accept all changes to keep the stakeholder happy","Direct them to the Product Owner for backlog prioritization","Tell them to wait until the project is complete","Escalate to senior management"],ans:1,
+exp:"The Product Owner owns the backlog. The Scrum Master shields the team and redirects scope changes to the PO.",hint:"Who guards the Product Backlog?"},
+{q:"What is the ideal size of a Scrum Development Team?",
+opts:["1-3 members","3-9 members","10-15 members","No limit"],ans:1,
+exp:"Scrum Guide recommends 3-9 developers (plus PO and SM). Too small lacks diversity; too large creates communication overhead.",hint:"Small enough to stay agile, large enough to deliver."},
+{q:"A PM transitioning to Agile wants to assign individual tasks during Sprint Planning. This approach is:",
+opts:["Correct — the PM should assign tasks based on skills","Incorrect — the team self-organizes and picks their own work","Only appropriate for junior teams","Required by the PMBOK Guide"],ans:1,
+exp:"Self-organizing teams choose their own work. The PM/SM facilitates, not assigns. This is a core Agile principle.",hint:"Who decides HOW the work gets done in Agile?"}
+]},
+
+7:{title:"Negotiation & Influence",domain:"People",weight:"4-5 Qs",xp:150,
+lesson:`<h3>Negotiation in Project Management</h3>
+<div class="concept" style="border-color:#6366f1"><b>When PMs Negotiate:</b><br>• Resource assignments with functional managers<br>• Contract terms with vendors<br>• Scope changes with stakeholders<br>• Schedule adjustments with the team<br>• Budget allocations with the sponsor</div>
+<h3>Principled Negotiation (Harvard Method)</h3>
+<div class="concept" style="border-color:#22c55e">1. <b>Separate people from the problem</b><br>2. <b>Focus on interests, not positions</b><br>3. <b>Generate options for mutual gain</b><br>4. <b>Use objective criteria</b> (market data, standards, benchmarks)</div>
+<div class="tip">💡 <b>BATNA</b> = Best Alternative To a Negotiated Agreement. Know yours BEFORE negotiating. The stronger your BATNA, the more leverage you have.</div>
+<h3>Influence Without Authority</h3>
+<div class="concept" style="border-color:#f97316"><b>Power Types:</b><br>• <b>Expert</b> — based on knowledge/skills (most effective for PMs)<br>• <b>Referent</b> — based on respect/charisma (earned over time)<br>• <b>Legitimate</b> — based on position/title<br>• <b>Reward</b> — ability to give rewards<br>• <b>Coercive/Punishment</b> — ability to punish (WORST — never use!)</div>
+<div class="tip">🎯 PMI prefers <b>Expert</b> and <b>Referent</b> power. Coercive power is always the wrong answer on the exam.</div>`,
+quiz:[
+{q:"A functional manager refuses to release a key resource for your project. What should the PM try FIRST?",
+opts:["Escalate to the project sponsor","Negotiate by understanding the functional manager's constraints","File a formal complaint with HR","Replace the resource with a contractor"],ans:1,
+exp:"Always try to negotiate and understand the other party's constraints before escalating.",hint:"PMI prefers PM-level resolution before escalation."},
+{q:"Which type of power is MOST effective for a project manager in a matrix organization?",
+opts:["Legitimate power","Expert power","Coercive power","Reward power"],ans:1,
+exp:"In matrix organizations, PMs often lack formal authority. Expert power (knowledge-based) is most effective.",hint:"Matrix PMs can't pull rank. What else earns respect?"},
+{q:"During vendor contract negotiation, the PM should focus on:",
+opts:["Getting the lowest price possible","Creating a win-win outcome based on mutual interests","Using BATNA as a threat","Letting procurement handle everything"],ans:1,
+exp:"PMI favors win-win (integrative) negotiation. Focus on mutual interests, not just price.",hint:"What negotiation style does PMI always prefer?"}
+]},
+
+8:{title:"Virtual & Distributed Teams",domain:"People",weight:"3-5 Qs",xp:150,
+lesson:`<h3>Challenges of Virtual Teams</h3>
+<div class="concept" style="border-color:#ef4444"><b>Common Issues:</b><br>• Time zone differences<br>• Cultural misunderstandings<br>• Lack of nonverbal communication cues<br>• Technology barriers and connectivity<br>• Isolation and reduced team bonding<br>• Difficulty building trust remotely</div>
+<h3>Best Practices</h3>
+<div class="concept" style="border-color:#22c55e"><b>PM Actions:</b><br>• Establish clear communication protocols (tools, response times, overlap hours)<br>• Use video calls over audio-only when possible<br>• Create team agreements for virtual collaboration<br>• Schedule regular check-ins across time zones<br>• Build in social/team-building activities<br>• Use shared project management tools for transparency</div>
+<div class="tip">🎯 <b>Exam Key:</b> When the exam mentions "distributed team" or "virtual environment," the answer usually involves MORE communication, not less. Over-communicate!</div>
+<h3>Communication Channels Formula</h3>
+<div class="concept" style="border-color:#6366f1"><b>N × (N-1) / 2</b><br>Where N = number of people<br><br>Example: 10 people = 10×9/2 = <b>45 channels</b><br>Add 1 person (11) = 11×10/2 = <b>55 channels</b> (10 more!)<br><br>This is why smaller teams communicate better.</div>`,
+quiz:[
+{q:"You manage a team across 4 time zones. Two members complain they never overlap. What should you do?",
+opts:["Tell them to work different hours","Establish core overlap hours and asynchronous communication protocols","Move one person to another time zone","Remove them from the project"],ans:1,
+exp:"Establish protocols: core hours for synchronous work, async tools for the rest. This is standard virtual team management.",hint:"How do you bridge time zone gaps practically?"},
+{q:"Your team grows from 6 to 8 members. How many NEW communication channels are added?",
+opts:["2","8","13 (from 15 to 28)","16"],ans:2,
+exp:"6 members = 6×5/2 = 15 channels. 8 members = 8×7/2 = 28 channels. Difference = 13 new channels.",hint:"Use the formula: N×(N-1)/2 for each, then subtract."},
+{q:"For a virtual team, what is the MOST effective communication method?",
+opts:["Email chains","Video conferencing","Text messages","Written memos"],ans:1,
+exp:"Video provides the richest communication (visual + verbal + nonverbal cues). PMI values rich media for complex topics.",hint:"Which method is closest to face-to-face?"}
+]},
+
+9:{title:"Resource Management & Organizational Structures",domain:"People",weight:"5-7 Qs",xp:150,
+lesson:`<h3>Organizational Structures</h3>
+<div class="concept" style="border-color:#ef4444"><b>Functional (Silo):</b><br>• Staff grouped by specialty (engineering, marketing, etc.)<br>• Functional Manager has authority over resources<br>• PM has little to NO authority<br>• Best for: routine operations</div>
+<div class="concept" style="border-color:#f97316"><b>Matrix (Weak / Balanced / Strong):</b><br>• <b>Weak Matrix:</b> PM is a coordinator, FM has authority<br>• <b>Balanced Matrix:</b> PM and FM share authority<br>• <b>Strong Matrix:</b> PM has more authority than FM<br>• Most common structure for projects</div>
+<div class="concept" style="border-color:#22c55e"><b>Projectized:</b><br>• PM has FULL authority over resources and budget<br>• Team is dedicated 100% to the project<br>• Best for: large, complex, high-priority projects</div>
+<h3>Resource Management Tools</h3>
+<div class="concept" style="border-color:#6366f1"><b>RACI Matrix:</b><br>• <b>R</b>esponsible — does the work<br>• <b>A</b>ccountable — ultimately answerable (ONLY ONE per task)<br>• <b>C</b>onsulted — provides input (two-way communication)<br>• <b>I</b>nformed — kept updated (one-way communication)</div>
+<div class="tip">💡 <b>Golden Rule:</b> There can be ONLY ONE "A" (Accountable) per activity. Multiple R's are fine, but one person owns the outcome.</div>`,
+quiz:[
+{q:"In a Weak Matrix, the PM's role is BEST described as:",
+opts:["Full authority over the team","Coordinator or expediter with limited authority","Equal authority with the functional manager","No involvement in resource decisions"],ans:1,
+exp:"In a Weak Matrix, the PM is essentially a coordinator. The Functional Manager retains authority over resources.",hint:"'Weak' refers to the PM's power level."},
+{q:"A RACI chart shows two people as 'Accountable' for the same deliverable. This is:",
+opts:["Acceptable for complex deliverables","A problem — only ONE person can be Accountable","Required in matrix organizations","Normal for Agile projects"],ans:1,
+exp:"Only ONE person can be Accountable. Having two creates confusion about who owns the outcome.",hint:"The 'A' rule: one and only one."},
+{q:"In which organization does the PM have the MOST authority?",
+opts:["Functional","Weak Matrix","Balanced Matrix","Projectized"],ans:3,
+exp:"Projectized organizations give the PM full authority. Functional gives the least.",hint:"Think of a spectrum from least PM power to most."},
+{q:"The functional manager and PM disagree about a team member's assignment priority. In a Balanced Matrix, who decides?",
+opts:["The PM always wins","The functional manager always wins","They must negotiate and collaborate","The team member decides"],ans:2,
+exp:"In a Balanced Matrix, authority is shared. Neither has final say — they must negotiate.",hint:"'Balanced' means equal. How do equals resolve disagreements?"}
+]},
+
+10:{title:"Ethics, Professional Conduct & PMI Code",domain:"People",weight:"3-5 Qs",xp:150,
+lesson:`<h3>PMI Code of Ethics & Professional Conduct</h3>
+<div class="tip">🎯 Ethics questions appear on every PMP exam. They test whether you'll do the RIGHT thing vs. the EASY thing.</div>
+<div class="concept" style="border-color:#6366f1"><b>Four Core Values:</b><br>1. <b>Responsibility</b> — own your decisions and consequences<br>2. <b>Respect</b> — treat everyone with dignity<br>3. <b>Fairness</b> — make impartial decisions, avoid favoritism<br>4. <b>Honesty</b> — be truthful in communications and conduct</div>
+<h3>Common Ethics Scenarios</h3>
+<div class="concept" style="border-color:#ef4444"><b>Conflict of Interest:</b> You discover your cousin's company is bidding on a contract. You MUST disclose the relationship and recuse yourself from the evaluation.</div>
+<div class="concept" style="border-color:#f97316"><b>Cultural Gifts:</b> A vendor offers an expensive gift. Check your organization's policy. If no policy exists, decline or accept only token/nominal value gifts.</div>
+<div class="concept" style="border-color:#22c55e"><b>Discovered Errors:</b> You find a significant error in a competitor's proposal. You MUST report it — even if it hurts your competitive position.</div>
+<div class="concept" style="border-color:#a855f7"><b>Intellectual Property:</b> Never use your employer's proprietary information at a new job. Never share confidential data without authorization.</div>
+<div class="tip">💡 <b>Exam Key:</b> When in doubt, choose the answer that is most transparent, honest, and protects the public interest — even if it's uncomfortable.</div>`,
+quiz:[
+{q:"You discover that a team member falsified their PMP application hours. What should you do?",
+opts:["Ignore it — it's not your problem","Confront them privately and ask them to correct it","Report it to PMI","Both B and C — address it and report"],ans:3,
+exp:"The PMI Code requires reporting violations. You should address it with them AND report to PMI.",hint:"PMI Code: what's your obligation when you discover dishonesty?"},
+{q:"A vendor in a foreign country offers you a $500 gift as a 'cultural custom.' Your company has no gift policy. What do you do?",
+opts:["Accept it to avoid offending them","Politely decline and explain your ethical standards","Accept it but don't tell anyone","Report the vendor for attempted bribery"],ans:1,
+exp:"Without a company policy, err on the side of caution. Politely decline while respecting cultural differences.",hint:"When there's no policy, what does the PMI Code say about gifts?"},
+{q:"The right ethical decision according to PMI is:",
+opts:["Whatever benefits the project most","Whatever the sponsor wants","Whatever is transparent, honest, and protects stakeholder interests","Whatever is easiest to implement"],ans:2,
+exp:"PMI's Code prioritizes transparency, honesty, and stakeholder protection — even when it's difficult.",hint:"PMI values doing RIGHT over doing EASY."}
+]},
+
+11:{title:"Scope Management & Requirements",domain:"Process",weight:"8-10 Qs",xp:175,
+lesson:`<h3>Scope Management</h3><div class="tip">🎯 Scope is the #1 cause of project failure. Expect 8-10 questions.</div>
+<div class="concept" style="border-color:#6366f1"><b>Product Scope</b> = features and functions of the deliverable<br><b>Project Scope</b> = the work needed to deliver the product scope</div>
+<div class="concept" style="border-color:#22c55e"><b>WBS (Work Breakdown Structure):</b><br>• Decomposes the total scope into manageable pieces<br>• Lowest level = <b>Work Packages</b><br>• 100% Rule: WBS must include ALL project work<br>• The WBS Dictionary defines each element in detail</div>
+<div class="concept" style="border-color:#f97316"><b>Requirements Traceability Matrix:</b><br>Links requirements to their origin and tracks through delivery. Ensures nothing is missed.</div>
+<div class="tip">💡 <b>Gold Plating</b> = adding extras the customer didn't ask for. PMI says NEVER gold plate!</div>`,
+quiz:[{q:"A team member adds extra features the customer didn't request. This is called:",opts:["Scope Creep","Gold Plating","Progressive Elaboration","Value Engineering"],ans:1,
+exp:"Gold Plating = adding unrequested extras. Scope Creep = uncontrolled scope changes. Both are bad, but Gold Plating is the PM/team's fault.",hint:"Who initiated the extra work — the customer or the team?"},
+{q:"The 100% Rule for WBS means:",opts:["100% of the budget must be allocated","The WBS must capture ALL deliverables and project work","All team members must contribute","100% accuracy in estimates"],ans:1,
+exp:"The 100% Rule ensures the WBS includes every piece of work — nothing missing, nothing extra.",hint:"What does 'complete decomposition' mean?"},
+{q:"What is the PRIMARY purpose of a Requirements Traceability Matrix?",opts:["Track budget spending","Link each requirement to its business objective and test case","Assign resources to tasks","Schedule milestones"],ans:1,
+exp:"The RTM traces requirements from origin through delivery and testing, ensuring nothing falls through the cracks.",hint:"'Traceability' means tracking from start to finish."}]},
+
+12:{title:"Schedule Management & Critical Path",domain:"Process",weight:"8-10 Qs",xp:200,
+lesson:`<h3>Critical Path Method (CPM)</h3><div class="tip">🎯 <b>Must-Know!</b> CPM questions are nearly guaranteed. Learn forward/backward pass.</div>
+<div class="concept" style="border-color:#ef4444"><b>Critical Path</b> = the LONGEST path through the network = minimum project duration<br>• Activities on the critical path have <b>ZERO float/slack</b><br>• Any delay on the critical path delays the entire project<br>• A project can have multiple critical paths</div>
+<div class="concept" style="border-color:#6366f1"><b>Float (Slack):</b><br>• <b>Total Float</b> = how much an activity can delay without delaying the project end<br>• <b>Free Float</b> = how much an activity can delay without delaying the NEXT activity<br>• Formula: TF = LS - ES = LF - EF</div>
+<div class="concept" style="border-color:#22c55e"><b>Schedule Compression:</b><br>• <b>Crashing</b> = add resources to critical path activities (increases cost!)<br>• <b>Fast-Tracking</b> = do activities in parallel that were planned sequentially (increases risk!)</div>
+<div class="concept" style="border-color:#f97316"><b>Dependencies:</b><br>• <b>FS</b> (Finish-to-Start) — most common, default<br>• <b>SS</b> (Start-to-Start)<br>• <b>FF</b> (Finish-to-Finish)<br>• <b>SF</b> (Start-to-Finish) — rarest</div>`,
+quiz:[{q:"The critical path has zero float. A critical activity is delayed by 3 days. What happens?",opts:["Nothing — float absorbs it","The project end date shifts by 3 days","Only that phase is delayed","The budget increases by 3 days of cost"],ans:1,
+exp:"Zero float = no buffer. Any delay on the critical path directly delays the project completion.",hint:"What does 'zero float' mean for schedule impact?"},
+{q:"To compress the schedule without increasing risk, the PM should:",opts:["Fast-track activities","Crash critical path activities","Reduce scope","Extend the deadline"],ans:1,
+exp:"Crashing adds resources (increases cost but not risk). Fast-tracking increases risk by doing things in parallel.",hint:"Which method adds cost but NOT risk?"},
+{q:"Activity A (5 days) → Activity B (3 days) → Activity C (7 days). Activity D (4 days) runs parallel to B and C. What is the critical path duration?",opts:["12 days","15 days","9 days","19 days"],ans:1,
+exp:"Path 1: A+B+C = 15 days. Path 2: A+D = 9 days. Critical path = longest = 15 days.",hint:"Find ALL paths, pick the LONGEST."}]},
+
+13:{title:"Cost Management & Earned Value",domain:"Process",weight:"8-10 Qs",xp:200,
+lesson:`<h3>Earned Value Management (EVM)</h3><div class="tip">🎯 <b>Highest-Value Topic!</b> EVM questions are math-based — learn these formulas and you get FREE points.</div>
+<div class="concept" style="border-color:#6366f1"><b>Three Key Values:</b><br>• <b>PV</b> (Planned Value) = what you PLANNED to spend by now<br>• <b>EV</b> (Earned Value) = value of work ACTUALLY completed<br>• <b>AC</b> (Actual Cost) = what you ACTUALLY spent</div>
+<div class="concept" style="border-color:#22c55e"><b>Variances:</b><br>• <b>CV</b> = EV - AC (Cost Variance — negative = over budget)<br>• <b>SV</b> = EV - PV (Schedule Variance — negative = behind schedule)</div>
+<div class="concept" style="border-color:#f97316"><b>Indices:</b><br>• <b>CPI</b> = EV / AC (below 1.0 = over budget)<br>• <b>SPI</b> = EV / PV (below 1.0 = behind schedule)</div>
+<div class="concept" style="border-color:#a855f7"><b>Forecasting:</b><br>• <b>EAC</b> = BAC / CPI (Estimate at Completion — most common formula)<br>• <b>ETC</b> = EAC - AC (Estimate to Complete)<br>• <b>VAC</b> = BAC - EAC (Variance at Completion)</div>
+<div class="tip">💡 Memory trick: If the index starts with C, divide by AC. If S, divide by PV. Negative variance = bad. Index below 1.0 = bad.</div>`,
+quiz:[{q:"PV=$100K, EV=$80K, AC=$90K. Is the project on budget and schedule?",opts:["Over budget and behind schedule","Under budget and ahead of schedule","Over budget but ahead of schedule","Under budget but behind schedule"],ans:0,
+exp:"CV = 80-90 = -$10K (over budget). SV = 80-100 = -$20K (behind schedule). Both negative = bad.",hint:"Negative CV = over budget. Negative SV = behind schedule."},
+{q:"CPI = 0.8 and BAC = $500K. What is the EAC?",opts:["$400K","$500K","$625K","$800K"],ans:2,
+exp:"EAC = BAC/CPI = 500K/0.8 = $625K. The project will cost $125K more than planned.",hint:"EAC = BAC / CPI. Divide, don't multiply."},
+{q:"SPI = 1.2 means the project is:",opts:["20% behind schedule","20% ahead of schedule","20% over budget","Exactly on schedule"],ans:1,
+exp:"SPI > 1.0 = ahead of schedule. 1.2 means earning 20% more value than planned.",hint:"SPI above 1.0 is good. How much above?"}]},
+
+14:{title:"Quality Management",domain:"Process",weight:"5-7 Qs",xp:150,
+lesson:`<h3>Quality Concepts</h3>
+<div class="concept" style="border-color:#6366f1"><b>Quality vs Grade:</b><br>• <b>Quality</b> = degree to which requirements are met (low quality = always bad)<br>• <b>Grade</b> = category or rank (low grade may be intentional and acceptable)</div>
+<div class="concept" style="border-color:#22c55e"><b>Prevention over Inspection:</b><br>• <b>Cost of Conformance</b> = money spent to PREVENT defects (training, testing, quality planning)<br>• <b>Cost of Nonconformance</b> = money spent because of FAILURES (rework, scrap, warranty, liability)<br>• PMI says: prevention is CHEAPER than inspection!</div>
+<div class="concept" style="border-color:#f97316"><b>Quality Tools:</b><br>• <b>Pareto Chart</b> — 80/20 rule: 80% of problems come from 20% of causes<br>• <b>Ishikawa (Fishbone)</b> — root cause analysis diagram<br>• <b>Control Charts</b> — monitors process stability (Upper/Lower Control Limits)<br>• <b>Scatter Diagram</b> — shows correlation between two variables<br>• <b>Histogram</b> — frequency distribution of data</div>
+<div class="tip">💡 A process is "out of control" when: a data point exceeds control limits OR 7+ consecutive points are on one side of the mean (Rule of Seven).</div>`,
+quiz:[{q:"A data point falls within control limits but 8 consecutive points are above the mean. The process is:",opts:["In control — all points within limits","Out of control — Rule of Seven violated","Statistically insignificant","Normal variation"],ans:1,
+exp:"Rule of Seven: 7+ consecutive points on one side of the mean = process is out of control, even if within limits.",hint:"How many consecutive points trigger the Rule of Seven?"},
+{q:"The BEST approach to quality according to PMI is:",opts:["Inspect all deliverables before delivery","Prevention — build quality in from the start","Fix defects as they're found","Hire a QA team to test everything"],ans:1,
+exp:"PMI's mantra: 'Quality is planned in, not inspected in.' Prevention is always cheaper than correction.",hint:"Is it cheaper to prevent or detect defects?"},
+{q:"80% of defects in your product come from 3 root causes. Which tool identified this?",opts:["Scatter Diagram","Control Chart","Pareto Chart","Fishbone Diagram"],ans:2,
+exp:"Pareto Chart applies the 80/20 rule — focus on the vital few causes that create the most defects.",hint:"Which tool is associated with the 80/20 principle?"}]},
+
+15:{title:"Risk Management",domain:"Process",weight:"8-10 Qs",xp:200,
+lesson:`<h3>Risk Management Process</h3><div class="tip">🎯 Risk is heavily tested. Know the process, strategies, and how to calculate EMV.</div>
+<div class="concept" style="border-color:#6366f1"><b>Risk = Uncertainty.</b> Can be negative (threats) or positive (opportunities).<br>Risk Score = Probability × Impact</div>
+<div class="concept" style="border-color:#ef4444"><b>Threat Response Strategies:</b><br>• <b>Avoid</b> — eliminate the threat entirely (change the plan)<br>• <b>Mitigate</b> — reduce probability or impact<br>• <b>Transfer</b> — shift impact to a third party (insurance, contracts)<br>• <b>Accept</b> — acknowledge and deal with it if it happens (active or passive)<br>• <b>Escalate</b> — move to higher authority if beyond PM's control</div>
+<div class="concept" style="border-color:#22c55e"><b>Opportunity Response Strategies:</b><br>• <b>Exploit</b> — ensure the opportunity happens<br>• <b>Enhance</b> — increase probability or impact<br>• <b>Share</b> — partner with a third party to capture it<br>• <b>Accept</b> — take advantage if it occurs naturally</div>
+<div class="concept" style="border-color:#f97316"><b>EMV (Expected Monetary Value):</b><br>EMV = Probability × Impact<br>Example: 30% chance of $100K loss → EMV = -$30K<br>Use for decision trees and contingency reserves.</div>`,
+quiz:[{q:"A risk has 40% probability and $200K impact. The EMV is:",opts:["$200K","$80K","$40K","$120K"],ans:1,
+exp:"EMV = 0.40 × $200K = $80K. This helps quantify risk for budget reserves.",hint:"Multiply probability by impact."},
+{q:"Your project faces a risk that could shut down the company. It's beyond your authority to address. You should:",opts:["Mitigate it yourself","Transfer it via insurance","Accept it passively","Escalate it to senior management"],ans:3,
+exp:"Risks beyond the PM's authority should be escalated. This is a valid risk response strategy.",hint:"When it's above your pay grade, what do you do?"},
+{q:"The PM buys insurance for a natural disaster risk. This is an example of:",opts:["Avoidance","Mitigation","Transference","Acceptance"],ans:2,
+exp:"Insurance transfers the financial impact to the insurer. The risk still exists but the cost impact is shifted.",hint:"Who bears the financial loss after buying insurance?"}]},
+
+16:{title:"Procurement & Contract Types",domain:"Process",weight:"5-7 Qs",xp:175,
+lesson:`<h3>Contract Types</h3>
+<div class="concept" style="border-color:#ef4444"><b>Fixed-Price (FP) Contracts:</b><br>• <b>FFP</b> (Firm Fixed Price) — price is set, seller bears all cost risk<br>• <b>FPIF</b> (FP + Incentive Fee) — target price + incentive for performance<br>• <b>FPEPA</b> (FP + Economic Price Adjustment) — for multi-year contracts with inflation<br><b>Risk:</b> Seller has MOST risk. Use when scope is well-defined.</div>
+<div class="concept" style="border-color:#22c55e"><b>Cost-Reimbursable (CR) Contracts:</b><br>• <b>CPFF</b> (Cost + Fixed Fee) — cost reimbursed + fixed profit<br>• <b>CPIF</b> (Cost + Incentive Fee) — cost + incentive for targets<br>• <b>CPAF</b> (Cost + Award Fee) — cost + subjective award from buyer<br><b>Risk:</b> Buyer has MOST risk. Use when scope is uncertain.</div>
+<div class="concept" style="border-color:#f97316"><b>Time & Materials (T&M):</b><br>Hybrid — fixed rate per hour, variable total cost. Use for small, undefined work.</div>
+<div class="tip">💡 <b>Exam Key:</b> Well-defined scope → Fixed Price (seller risk). Uncertain scope → Cost-Reimbursable (buyer risk).</div>`,
+quiz:[{q:"Scope is clearly defined and unlikely to change. Which contract type is BEST?",opts:["Cost Plus Fixed Fee","Time & Materials","Firm Fixed Price","Cost Plus Incentive Fee"],ans:2,
+exp:"Well-defined scope = FFP. The seller bears cost risk, so they're motivated to be efficient.",hint:"Clear scope = which party should bear the risk?"},
+{q:"In a CPFF contract, who bears MOST of the cost risk?",opts:["The seller","The buyer","Risk is shared equally","Neither — it's fixed"],ans:1,
+exp:"Cost-Reimbursable = buyer pays all costs + a fee. Buyer bears most financial risk.",hint:"Who reimburses the costs in a CR contract?"},
+{q:"A contract where the seller is paid per hour with no maximum is:",opts:["Firm Fixed Price","Cost Plus Award Fee","Time & Materials","Lump Sum"],ans:2,
+exp:"T&M contracts pay a fixed rate per unit of time. Without a ceiling, costs can grow indefinitely.",hint:"Which contract type combines fixed rates with variable scope?"}]},
+
+17:{title:"Integration Management & Change Control",domain:"Process",weight:"6-8 Qs",xp:175,
+lesson:`<h3>Integrated Change Control</h3><div class="tip">🎯 Every change on the exam goes through the same process. No exceptions.</div>
+<div class="concept" style="border-color:#6366f1"><b>Change Control Process:</b><br>1. Submit a Change Request (CR)<br>2. Assess impact on scope, schedule, cost, quality, risk<br>3. CCB (Change Control Board) reviews and approves/rejects<br>4. Update project documents and baselines if approved<br>5. Communicate the decision to stakeholders</div>
+<div class="concept" style="border-color:#ef4444"><b>Key Rules:</b><br>• ALL changes must be formally documented<br>• The PM NEVER approves scope/baseline changes alone (CCB does)<br>• Even rejected changes are logged in the change log<br>• Approved changes update the Project Management Plan</div>
+<div class="concept" style="border-color:#22c55e"><b>The Project Charter:</b><br>• Created by the sponsor (not the PM)<br>• Formally authorizes the project<br>• Gives the PM authority<br>• Contains: purpose, objectives, high-level requirements, milestones, budget summary, key stakeholders</div>
+<div class="tip">💡 <b>Exam Key:</b> If someone asks for a change, NEVER just do it. The answer is always: "Submit a change request."</div>`,
+quiz:[{q:"The sponsor verbally asks you to add a major feature. Your FIRST action is:",opts:["Start working on it — the sponsor has authority","Submit a formal change request and assess impact","Reject it — the scope is baselined","Ask the team if they can fit it in"],ans:1,
+exp:"ALL changes go through formal change control. Even sponsor requests must be documented and impact-assessed.",hint:"What's the first step in change control?"},
+{q:"Who has the authority to approve changes to the project baseline?",opts:["The Project Manager","The Project Sponsor alone","The Change Control Board (CCB)","The functional manager"],ans:2,
+exp:"The CCB approves/rejects baseline changes. The PM facilitates the process but doesn't have sole approval authority.",hint:"Who is the gatekeeper for baselines?"},
+{q:"A change request is rejected by the CCB. What should the PM do with it?",opts:["Delete it from the records","Log it in the change log as rejected","Resubmit it with stronger justification","Implement it anyway if the sponsor wants it"],ans:1,
+exp:"ALL change requests — approved or rejected — must be documented in the change log for audit trail.",hint:"Does rejected mean forgotten?"}]},
+
+18:{title:"Communications Management",domain:"Process",weight:"4-6 Qs",xp:150,
+lesson:`<h3>Communication Models & Methods</h3>
+<div class="concept" style="border-color:#6366f1"><b>Communication Model:</b><br>Sender → Encode → Message → Medium → Decode → Receiver → Feedback<br><br><b>Noise</b> can corrupt at any stage. The sender is responsible for ensuring the message is understood.</div>
+<div class="concept" style="border-color:#22c55e"><b>Communication Methods:</b><br>• <b>Interactive</b> — real-time, two-way (meetings, calls, video) — MOST effective<br>• <b>Push</b> — sent out, no guarantee it's read (email, reports, memos)<br>• <b>Pull</b> — recipient retrieves when needed (intranet, wiki, shared drive)</div>
+<div class="concept" style="border-color:#f97316"><b>Communication Dimensions:</b><br>• <b>Formal Written</b> — contracts, project plans, status reports<br>• <b>Formal Verbal</b> — presentations, speeches<br>• <b>Informal Written</b> — emails, texts, chat messages<br>• <b>Informal Verbal</b> — conversations, hallway chats</div>
+<div class="tip">💡 PMs spend <b>90% of their time communicating</b>. The exam loves this fact.</div>`,
+quiz:[{q:"A PM sends a weekly status report via email. This is an example of:",opts:["Interactive communication","Push communication","Pull communication","Formal verbal communication"],ans:1,
+exp:"Email is Push — sent to recipients without guarantee they'll read it. It's not interactive (no real-time exchange).",hint:"Does the sender know the recipient received and understood it?"},
+{q:"For a complex, sensitive issue with a stakeholder, the PM should use:",opts:["Email to create a paper trail","Face-to-face meeting","A formal written memo","A voicemail message"],ans:1,
+exp:"Complex/sensitive topics require Interactive (face-to-face) communication for immediate feedback and nonverbal cues.",hint:"Which method gives the richest feedback?"},
+{q:"A project has 15 stakeholders. How many communication channels exist?",opts:["15","90","105","225"],ans:2,
+exp:"N(N-1)/2 = 15×14/2 = 105 channels. This is why communication planning is critical for larger projects.",hint:"Use the formula: N × (N-1) / 2"}]},
+
+19:{title:"Agile & Hybrid Methodologies",domain:"Process",weight:"8-10 Qs",xp:200,
+lesson:`<h3>Agile Fundamentals</h3><div class="tip">🎯 ~50% of the exam is Agile/Hybrid. This is non-negotiable content.</div>
+<div class="concept" style="border-color:#6366f1"><b>Agile Manifesto Values:</b><br>• Individuals and interactions > processes and tools<br>• Working software > comprehensive documentation<br>• Customer collaboration > contract negotiation<br>• Responding to change > following a plan</div>
+<div class="concept" style="border-color:#22c55e"><b>Scrum Events:</b><br>• <b>Sprint Planning</b> — team selects backlog items, creates sprint goal<br>• <b>Daily Standup</b> — 15 min, what done/doing/blocked<br>• <b>Sprint Review</b> — demo to stakeholders, get feedback<br>• <b>Sprint Retrospective</b> — team reflects on process improvement</div>
+<div class="concept" style="border-color:#f97316"><b>Kanban:</b><br>• Visualize workflow on a board<br>• Limit Work in Progress (WIP limits)<br>• Manage flow — pull system, not push<br>• No prescribed iterations or roles</div>
+<div class="concept" style="border-color:#a855f7"><b>Hybrid Approach:</b><br>Combines predictive (waterfall) and adaptive (agile) methods. Example: infrastructure uses waterfall, software uses Scrum. PMI strongly supports tailoring the approach to fit the project.</div>`,
+quiz:[{q:"The Agile Manifesto values 'responding to change' over:",opts:["Customer collaboration","Working software","Following a plan","Individuals and interactions"],ans:2,
+exp:"The fourth value: 'Responding to change over following a plan.' Agile embraces change, not rigid plans.",hint:"What does Agile prioritize LESS than adaptability?"},
+{q:"A team's WIP limit is 3 but they have 5 items in progress. According to Kanban, they should:",opts:["Increase the WIP limit to 5","Stop starting new work and finish existing items","Add more team members","Work overtime to clear the backlog"],ans:1,
+exp:"Kanban WIP limits are enforced. Stop starting, start finishing. This prevents bottlenecks.",hint:"What does 'limit' mean in WIP limits?"},
+{q:"Which Scrum event focuses on PROCESS improvement?",opts:["Sprint Planning","Sprint Review","Sprint Retrospective","Daily Standup"],ans:2,
+exp:"Retrospective = how did we WORK? (process). Review = what did we BUILD? (product).",hint:"Which event looks BACKWARD at how the team worked?"}]},
+
+20:{title:"Estimating Techniques",domain:"Process",weight:"4-6 Qs",xp:150,
+lesson:`<h3>Estimation Methods</h3>
+<div class="concept" style="border-color:#6366f1"><b>Analogous Estimating:</b><br>Uses historical data from similar past projects. Quick but less accurate. Top-down approach.</div>
+<div class="concept" style="border-color:#22c55e"><b>Parametric Estimating:</b><br>Uses statistical relationships. Example: $100/sq ft × 2000 sq ft = $200K. More accurate than analogous.</div>
+<div class="concept" style="border-color:#f97316"><b>Bottom-Up Estimating:</b><br>Estimates individual work packages and rolls up. MOST accurate but takes the longest.</div>
+<div class="concept" style="border-color:#a855f7"><b>Three-Point Estimating (PERT):</b><br>• <b>O</b> = Optimistic, <b>M</b> = Most Likely, <b>P</b> = Pessimistic<br>• <b>Triangular:</b> (O + M + P) / 3<br>• <b>Beta/PERT:</b> (O + 4M + P) / 6<br>• Standard Deviation = (P - O) / 6</div>
+<div class="concept" style="border-color:#3b82f6"><b>Agile Estimation:</b><br>• <b>Story Points</b> — relative sizing (Fibonacci: 1, 2, 3, 5, 8, 13…)<br>• <b>Planning Poker</b> — team consensus on story point values<br>• <b>Velocity</b> — avg story points per sprint</div>
+<div class="tip">💡 <b>Exam Key:</b> Most accurate = Bottom-Up. Fastest = Analogous. PERT uses the Beta formula (4M weight).</div>`,
+quiz:[{q:"O=10 days, M=15 days, P=26 days. Using PERT/Beta, the estimate is:",opts:["15 days","17 days","16 days","18 days"],ans:2,
+exp:"PERT = (10 + 4×15 + 26) / 6 = (10+60+26)/6 = 96/6 = 16 days.",hint:"PERT formula: (O + 4M + P) / 6"},
+{q:"Which estimating technique is MOST accurate?",opts:["Analogous","Parametric","Bottom-Up","Expert Judgment"],ans:2,
+exp:"Bottom-Up is most accurate because it estimates every work package individually, then aggregates.",hint:"Which method looks at the smallest pieces?"},
+{q:"A team's velocity over the last 4 sprints was 20, 25, 22, 25. How many sprints to complete 140 remaining story points?",opts:["5 sprints","6 sprints","7 sprints","Cannot determine"],ans:1,
+exp:"Avg velocity = (20+25+22+25)/4 = 23 points/sprint. 140/23 ≈ 6.09 → 7 sprints (round up).",hint:"Average the velocities, then divide remaining work."}]},
+
+21:{title:"Lessons Learned & Project Closure",domain:"Process",weight:"3-5 Qs",xp:150,
+lesson:`<h3>Project Closure</h3>
+<div class="concept" style="border-color:#6366f1"><b>Close Project or Phase:</b><br>• Verify all deliverables are accepted<br>• Release resources<br>• Close procurements<br>• Archive project documents<br>• Capture lessons learned<br>• Final performance report to stakeholders</div>
+<div class="concept" style="border-color:#22c55e"><b>Lessons Learned Register:</b><br>• Updated throughout the project, not just at the end<br>• Becomes part of Organizational Process Assets (OPAs)<br>• Covers what went well, what didn't, and recommendations<br>• Stored in a lessons learned repository for future projects</div>
+<div class="tip">💡 <b>Exam Key:</b> Lessons learned are collected CONTINUOUSLY — not just at project end. This is a common trap.</div>`,
+quiz:[{q:"When should lessons learned be captured?",opts:["Only at project closure","Only after major milestones","Continuously throughout the project","Only when problems occur"],ans:2,
+exp:"PMI requires continuous lessons learned collection. Waiting until the end means losing valuable insights.",hint:"Is it better to capture insights while they're fresh or months later?"},
+{q:"During project closure, the PM discovers an unsigned deliverable acceptance. What should they do?",opts:["Close the project anyway","Get formal acceptance before closing","Ask the sponsor to sign retroactively","Document it as a lesson learned"],ans:1,
+exp:"All deliverables must have formal acceptance before closure. This is a mandatory step.",hint:"Can you close what hasn't been accepted?"}]},
+
+22:{title:"Earned Value Advanced & Forecasting",domain:"Process",weight:"4-6 Qs",xp:175,
+lesson:`<h3>Advanced EVM Formulas</h3>
+<div class="concept" style="border-color:#6366f1"><b>EAC Variations:</b><br>• <b>EAC = BAC / CPI</b> — assumes future performance = past performance (most common)<br>• <b>EAC = AC + (BAC - EV)</b> — assumes future work at planned rate<br>• <b>EAC = AC + [(BAC-EV) / (CPI×SPI)]</b> — considers both cost AND schedule performance</div>
+<div class="concept" style="border-color:#22c55e"><b>TCPI (To-Complete Performance Index):</b><br>• <b>TCPI = (BAC-EV) / (BAC-AC)</b> — efficiency needed to finish on budget<br>• If TCPI > 1.0, you need to be MORE efficient than planned (hard!)<br>• If TCPI < 1.0, you can be LESS efficient and still finish on budget</div>
+<div class="concept" style="border-color:#f97316"><b>Key Relationships:</b><br>• VAC = BAC - EAC (positive = under budget)<br>• ETC = EAC - AC (how much more to spend)<br>• % Complete = EV / BAC</div>
+<div class="tip">🎯 <b>Exam Key:</b> The exam loves giving you 3 values (PV, EV, AC) and asking for CPI, SPI, CV, SV, or EAC. Practice until it's automatic.</div>`,
+quiz:[{q:"BAC=$200K, EV=$100K, AC=$125K. What is the TCPI to finish on budget?",opts:["0.75","1.0","1.33","1.5"],ans:2,
+exp:"TCPI = (BAC-EV)/(BAC-AC) = (200-100)/(200-125) = 100/75 = 1.33. Need 33% more efficient — very hard!",hint:"TCPI = remaining work / remaining budget."},
+{q:"CPI=0.9, SPI=0.85, BAC=$300K, AC=$180K, EV=$150K. Using the CPI×SPI formula, EAC is approximately:",opts:["$333K","$392K","$353K","$300K"],ans:1,
+exp:"EAC = AC + (BAC-EV)/(CPI×SPI) = 180 + (300-150)/(0.9×0.85) = 180 + 150/0.765 = 180 + 196 ≈ $376K. Closest: $392K.",hint:"Use the combined formula when both cost and schedule are impacted."}]},
+
+23:{title:"Benefits Realization & Value Delivery",domain:"Business",weight:"5-7 Qs",xp:175,
+lesson:`<h3>Benefits Management</h3>
+<div class="tip">🎯 Business Environment is 8% of the current exam but growing. These are often "soft" scenario questions.</div>
+<div class="concept" style="border-color:#6366f1"><b>Benefits Realization Plan:</b><br>• Created in the business case BEFORE the project starts<br>• Defines target benefits, metrics, timeline, and owners<br>• Benefits may be realized during AND after the project<br>• The PM ensures deliverables ENABLE benefits — but the business OWNS realization</div>
+<div class="concept" style="border-color:#22c55e"><b>Business Case:</b><br>• Justifies the project investment<br>• Contains NPV, ROI, IRR, Payback Period analysis<br>• Owned by the sponsor, not the PM<br>• Referenced throughout the project to ensure alignment</div>
+<div class="concept" style="border-color:#f97316"><b>Value Delivery System:</b><br>• Projects exist to deliver VALUE — not just outputs<br>• Portfolios → Programs → Projects → Operations<br>• Each level contributes to organizational strategy</div>`,
+quiz:[{q:"Who OWNS benefit realization after the project closes?",opts:["The Project Manager","The project team","The business/operations owner","The PMO"],ans:2,
+exp:"The PM delivers the product; the business owns realizing the benefits. Benefits often extend beyond project closure.",hint:"After the PM moves to the next project, who tracks if the benefits materialized?"},
+{q:"The business case shows negative NPV but strong strategic alignment. The project should:",opts:["Be cancelled — NPV is negative","Proceed if the strategic value is validated by the sponsor","Wait for NPV to improve","Reduce scope until NPV is positive"],ans:1,
+exp:"Not all project value is financial. Strategic alignment can justify a negative NPV if the sponsor approves.",hint:"Is money the ONLY measure of project value?"},
+{q:"During execution, the PM discovers the project can no longer deliver the expected benefits. What should they do FIRST?",opts:["Cancel the project immediately","Notify the sponsor and reassess the business case","Continue and hope benefits materialize","Reduce the project budget"],ans:1,
+exp:"When benefits are no longer achievable, escalate to the sponsor for a go/no-go decision based on the business case.",hint:"Who owns the business case and makes strategic decisions?"}]},
+
+24:{title:"Compliance, Standards & Regulations",domain:"Business",weight:"3-5 Qs",xp:150,
+lesson:`<h3>Compliance in Projects</h3>
+<div class="concept" style="border-color:#ef4444"><b>Regulations vs Standards:</b><br>• <b>Regulations</b> = MANDATORY (legal requirements, government-imposed)<br>• <b>Standards</b> = VOLUNTARY (industry best practices, can be adopted by choice)<br>• Non-compliance with regulations → legal penalties, project shutdown</div>
+<div class="concept" style="border-color:#6366f1"><b>Types of Compliance:</b><br>• Health and safety regulations<br>• Environmental regulations<br>• Data privacy (GDPR, HIPAA, etc.)<br>• Industry-specific standards (ISO, IEEE)<br>• Financial reporting requirements (SOX)</div>
+<div class="concept" style="border-color:#22c55e"><b>PM's Role in Compliance:</b><br>• Identify applicable regulations early<br>• Include compliance requirements in scope<br>• Plan for audits and inspections<br>• Never sacrifice compliance for schedule or budget</div>
+<div class="tip">💡 <b>Exam Key:</b> Compliance is NEVER optional. If a question puts compliance against schedule or budget, compliance wins every time.</div>`,
+quiz:[{q:"A regulation will delay the project by 3 weeks. The sponsor wants to skip it to meet the deadline. The PM should:",opts:["Comply with the sponsor — they have authority","Insist on compliance — regulations are mandatory","Negotiate a partial compliance","Skip it and document the risk"],ans:1,
+exp:"Regulations are non-negotiable. The PM must comply regardless of schedule pressure. Escalate if needed.",hint:"Can a sponsor override the law?"},
+{q:"The difference between a regulation and a standard is:",opts:["Regulations are voluntary; standards are mandatory","Regulations are mandatory; standards are voluntary","They are the same thing","Standards are always better than regulations"],ans:1,
+exp:"Regulations = must follow (legal). Standards = should follow (best practice, voluntary adoption).",hint:"Which one carries legal penalties for non-compliance?"}]},
+
+25:{title:"Organizational Change Management",domain:"Business",weight:"3-5 Qs",xp:150,
+lesson:`<h3>Change Management (Organizational)</h3>
+<div class="tip">⚠️ Don't confuse with Integrated Change Control (process changes). This is about managing how PEOPLE adapt to project outcomes.</div>
+<div class="concept" style="border-color:#6366f1"><b>Kotter's 8-Step Model:</b><br>1. Create urgency<br>2. Build a guiding coalition<br>3. Form a strategic vision<br>4. Enlist a volunteer army<br>5. Enable action by removing barriers<br>6. Generate short-term wins<br>7. Sustain acceleration<br>8. Institute change</div>
+<div class="concept" style="border-color:#22c55e"><b>ADKAR Model:</b><br>• <b>A</b>wareness — of the need for change<br>• <b>D</b>esire — to participate and support<br>• <b>K</b>nowledge — of how to change<br>• <b>A</b>bility — to implement new skills<br>• <b>R</b>einforcement — to sustain the change</div>
+<div class="concept" style="border-color:#f97316"><b>Resistance to Change:</b><br>• Normal and expected — don't punish it<br>• Address through communication, involvement, and training<br>• Early adopters can influence resisters<br>• Empathy first, then education</div>`,
+quiz:[{q:"Users resist using the new system your project delivered. Using ADKAR, what's likely missing?",opts:["Awareness — they don't know about it","Desire — they don't want to use it","Knowledge — they don't know HOW to use it","All could apply — assess which stage is blocked"],ans:3,
+exp:"ADKAR is sequential. You must identify which stage is blocked. Could be any stage — assess first, then target.",hint:"ADKAR stages build on each other. Where's the gap?"},
+{q:"Organizational Change Management is DIFFERENT from project change control because:",opts:["It focuses on people adapting to new ways of working","It only applies to IT projects","It replaces the CCB process","It's only needed after project closure"],ans:0,
+exp:"OCM = how people adapt. Change Control = how we manage scope/schedule/cost changes. Both are needed.",hint:"One is about documents and baselines. The other is about humans."}]},
+
+26:{title:"Strategic Alignment & Project Selection",domain:"Business",weight:"3-4 Qs",xp:150,
+lesson:`<h3>Project Selection Methods</h3>
+<div class="concept" style="border-color:#6366f1"><b>Financial Selection Methods:</b><br>• <b>NPV</b> (Net Present Value) — higher is better. Choose the project with the highest NPV.<br>• <b>IRR</b> (Internal Rate of Return) — higher is better. The rate at which NPV = 0.<br>• <b>ROI</b> (Return on Investment) — (Gain-Cost)/Cost × 100%. Higher is better.<br>• <b>Payback Period</b> — shorter is better. Time to recoup investment.</div>
+<div class="concept" style="border-color:#22c55e"><b>Strategic Alignment:</b><br>• Projects must support organizational strategy<br>• Portfolio management selects and prioritizes projects<br>• Kill criteria: if a project no longer aligns, terminate it<br>• Sunk costs should NOT influence go/no-go decisions</div>
+<div class="tip">💡 <b>Exam Key:</b> Sunk Cost Fallacy — money already spent is irrelevant to future decisions. PMI expects you to ignore sunk costs.</div>`,
+quiz:[{q:"Project A has NPV=$500K, Project B has NPV=$300K. Which should be selected?",opts:["Project B — lower risk","Project A — higher NPV","Either — NPV doesn't matter","Need more information"],ans:1,
+exp:"Higher NPV = more value. Always select the project with the highest NPV, all else being equal.",hint:"NPV: higher or lower is better?"},
+{q:"$2M has already been spent on a failing project. The sponsor says 'we can't waste $2M.' This thinking is:",opts:["Correct — protect the investment","The Sunk Cost Fallacy","Good financial management","Required by PMI standards"],ans:1,
+exp:"Sunk cost fallacy = letting past spending influence future decisions. The $2M is gone regardless. Decide based on future value.",hint:"Can you get the $2M back by continuing?"}]},
+
+27:{title:"Governance, PMO & Organizational Process Assets",domain:"Business",weight:"2-4 Qs",xp:150,
+lesson:`<h3>Project Governance</h3>
+<div class="concept" style="border-color:#6366f1"><b>PMO Types:</b><br>• <b>Supportive</b> — provides templates, training, best practices. Low control.<br>• <b>Controlling</b> — requires compliance with frameworks and methodologies. Medium control.<br>• <b>Directive</b> — directly manages projects. High control. PMs report to the PMO.</div>
+<div class="concept" style="border-color:#22c55e"><b>OPAs (Organizational Process Assets):</b><br>• Historical information, lessons learned, templates<br>• Organizational policies and procedures<br>• OWNED by the organization, not the PM</div>
+<div class="concept" style="border-color:#f97316"><b>EEFs (Enterprise Environmental Factors):</b><br>• Market conditions, regulations, culture<br>• Organizational structure, political climate<br>• EXTERNAL to the project — PM cannot change them</div>
+<div class="tip">💡 OPAs = things you CAN update (internal). EEFs = things you CAN'T change (external conditions).</div>`,
+quiz:[{q:"Which PMO type directly manages projects?",opts:["Supportive","Controlling","Directive","Advisory"],ans:2,
+exp:"Directive PMO directly manages projects. PMs are assigned by and report to the PMO.",hint:"Which type has the MOST control?"},
+{q:"Market conditions affecting your project are an example of:",opts:["OPAs","EEFs","Risk Register items","Lessons Learned"],ans:1,
+exp:"Enterprise Environmental Factors are external conditions the PM cannot control — market, regulations, culture.",hint:"Can the PM change market conditions?"}]},
+
+28:{title:"Exam Strategy — Question Decoding",domain:"Exam Prep",weight:"Meta",xp:200,
+lesson:`<h3>How to Decode PMP Questions</h3>
+<div class="tip">🎯 The PMP exam tests JUDGMENT, not memorization. Here's how to think like a PMP.</div>
+<div class="concept" style="border-color:#6366f1"><b>The PMI Mindset:</b><br>• Always prefer PROACTIVE over reactive<br>• Always prefer PREVENTION over correction<br>• Always prefer ROOT CAUSE over symptoms<br>• Always prefer SERVANT LEADERSHIP over command-and-control<br>• Always prefer WIN-WIN over compromise<br>• Always follow the PROCESS (never skip steps)</div>
+<div class="concept" style="border-color:#22c55e"><b>Question Decoding Strategy:</b><br>1. Read the LAST sentence first — that's the actual question<br>2. Identify the DOMAIN (People, Process, Business)<br>3. Eliminate obviously wrong answers (usually 2)<br>4. Between remaining 2, choose the one that's MORE proactive/preventive<br>5. "What should you do FIRST?" = pick the earliest process step</div>
+<div class="concept" style="border-color:#f97316"><b>Common Traps:</b><br>• "Immediately" in an answer = usually wrong (PMI wants you to analyze first)<br>• Three correct-sounding answers but one is the BEST — pick PMI's preferred approach<br>• Questions about what to do NEXT vs FIRST — sequence matters!</div>`,
+quiz:[{q:"A question asks 'What should you do FIRST?' Which answer is most likely correct?",opts:["Immediately implement a solution","Analyze the situation and gather information","Escalate to management","Schedule a meeting for next week"],ans:1,
+exp:"'FIRST' questions want the earliest logical step. Analysis/assessment almost always comes before action.",hint:"PMI: Analyze → Plan → Act. What comes first?"},
+{q:"Two answers seem correct. One is proactive (prevent the problem), one is reactive (fix after it happens). PMI prefers:",opts:["Reactive — it's more practical","Proactive — prevention over correction","Either is acceptable","Depends on the budget"],ans:1,
+exp:"PMI ALWAYS prefers proactive/preventive approaches. If you can prevent an issue, that's better than fixing it.",hint:"Is it cheaper to prevent or repair?"},
+{q:"You notice a pattern: every 'FIRST' answer you should choose involves assessment. Why?",opts:["PMI wants cautious PMs","You can't solve a problem you don't understand","Assessment is always the safest choice","It's a coincidence"],ans:1,
+exp:"PMI's philosophy: understand before acting. Assessment ensures your response addresses the root cause.",hint:"Would you prescribe medicine without a diagnosis?"}]},
+
+29:{title:"Full Mock Exam — Simulation",domain:"Exam Prep",weight:"All Domains",xp:300,
+lesson:`<h3>Mock Exam Instructions</h3>
+<div class="tip">🎯 This is a 10-question mini-mock covering ALL domains. Treat it like the real exam.</div>
+<div class="concept" style="border-color:#6366f1"><b>Real Exam Details:</b><br>• 180 questions in 230 minutes<br>• ~76 seconds per question<br>• 3 scored sections with 2 optional 10-min breaks<br>• Pass/fail — no published passing score (~60-65% estimated)<br>• Mix of multiple choice and multiple response</div>
+<div class="concept" style="border-color:#22c55e"><b>Test-Taking Tips:</b><br>• Flag difficult questions and return later<br>• Never leave a question blank (no penalty for guessing)<br>• Read ALL options before selecting<br>• Manage your time: 60 questions per section</div>
+<div class="concept" style="border-color:#f97316"><b>Day-Of Checklist:</b><br>• Arrive 30 minutes early<br>• Two valid forms of ID<br>• Brain dump key formulas immediately (EVM, PERT, channels)<br>• Stay calm — you've prepared for this</div>`,
+quiz:[{q:"A stakeholder requests scope change during Sprint 3. PO is on vacation. What should the Scrum Master do?",opts:["Accept the change to keep the stakeholder happy","Add it to the Product Backlog for the PO to prioritize upon return","Reject it — only PO can modify the backlog","Implement it if the team agrees"],ans:1,
+exp:"Only the PO manages the backlog. Add items for the PO to prioritize. SM protects the process.",hint:"Who owns the Product Backlog?"},
+{q:"CPI=0.85, SPI=1.1. The project is:",opts:["Under budget, behind schedule","Over budget, ahead of schedule","Under budget, ahead of schedule","Over budget, behind schedule"],ans:1,
+exp:"CPI<1 = over budget. SPI>1 = ahead of schedule. Know your indices!",hint:"Below 1 = bad for that metric."},
+{q:"A team member reports a safety violation on site. The PM should:",opts:["Log it as a risk","Stop work and address immediately","Continue work and report at end of day","Tell the team member to handle it"],ans:1,
+exp:"Safety is ALWAYS the top priority. Stop work immediately. No exceptions.",hint:"What's more important — schedule or safety?"},
+{q:"Which is NOT a Herzberg Motivator?",opts:["Recognition","Achievement","Salary","Growth"],ans:2,
+exp:"Salary is a Hygiene Factor (prevents dissatisfaction). Motivators: achievement, recognition, responsibility, growth.",hint:"Does a paycheck make you excited to work, or just not-unhappy?"},
+{q:"Your project is 80% complete. The sponsor cancels it due to market changes. What do you do FIRST?",opts:["Argue for continuation — 80% is almost done","Follow the project closure process","Ask the team what they think","Nothing — the sponsor decided"],ans:1,
+exp:"Even cancelled projects need formal closure: archive documents, release resources, capture lessons learned.",hint:"Does cancellation skip the closure process?"}]},
+
+30:{title:"Final Review & Certificate",domain:"Exam Prep",weight:"Capstone",xp:500,
+lesson:`<h3>🏆 Congratulations — You Completed the Course!</h3>
+<div class="concept" style="border-color:#22c55e"><b>What You've Mastered:</b><br>• People Domain — Conflict, Leadership, Motivation, Stakeholders, EQ, Teams, Ethics<br>• Process Domain — Scope, Schedule, Cost, Quality, Risk, Procurement, Change Control, Agile, EVM<br>• Business Environment — Benefits, Compliance, Change Management, Strategy, Governance</div>
+<div class="concept" style="border-color:#6366f1"><b>Next Steps:</b><br>1. Take a full 180-question practice exam (PMI Study Hall or PrepCast)<br>2. Review any weak areas identified by your quiz scores<br>3. Schedule your exam within 2 weeks while material is fresh<br>4. Brain dump EVM formulas and process flow on exam day<br>5. Trust your preparation — you've earned this</div>
+<div class="tip">🎯 You've completed 30 days of focused PMP training with 100+ practice questions. Print your certificate below and go ace that exam!</div>`,
+quiz:[{q:"What is the MOST important thing to do on exam day?",opts:["Cram the night before","Arrive early, stay calm, brain dump formulas","Bring study materials into the testing center","Skip difficult questions entirely"],ans:1,
+exp:"Preparation is done. Arrive early, brain dump your formulas, and trust your training.",hint:"Can you study MORE in the testing center?"},
+{q:"After passing the PMP, you must earn how many PDUs every 3 years to maintain certification?",opts:["30 PDUs","45 PDUs","60 PDUs","100 PDUs"],ans:2,
+exp:"PMP holders must earn 60 PDUs every 3 years in the CCR (Continuing Certification Requirements) cycle.",hint:"PMI requires ongoing learning. How many units?"}]}
+};
+
+// ═══════════════════════ RENDER ENGINE ═══════════════════════
+function render(){
+const app=document.getElementById('app');
+if(S.view==='landing')app.innerHTML=renderLanding();
+else if(S.view==='lesson')app.innerHTML=renderLesson();
+else if(S.view==='quiz')app.innerHTML=renderQuiz();
+else if(S.view==='summary')app.innerHTML=renderSummary();
+else if(S.view==='cert')app.innerHTML=renderCert();
+}
+
+function renderLanding(){
+return `<div class="container" style="max-width:700px;padding-top:60px">
+<div class="hero-glow" style="top:-200px;left:-200px;background:#6366f1"></div>
+<div class="hero-glow" style="bottom:-200px;right:-200px;background:#a855f7"></div>
+<div class="fade-up" style="text-align:center;margin-bottom:48px">
+<div class="badge badge-purple" style="margin-bottom:16px">30-DAY SYSTEM</div>
+<h1 style="font-size:2.8rem;font-weight:900;line-height:1.1;margin-bottom:16px">
+<span class="text-gradient">PMP Master</span><br>Training
+</h1>
+<p style="color:#94a3b8;font-size:1.1rem;max-width:500px;margin:0 auto 32px">Pass the PMP exam with 30 days of focused lessons, 100+ practice questions, and proven exam strategies. Zero fluff.</p>
+<button class="btn btn-primary btn-block" onclick="S.view='lesson';S.currentDay=1;save();render()" style="max-width:360px;margin:0 auto;font-size:1.15rem">🚀 Start Day 1 — Free Preview</button>
+<p style="color:#64748b;font-size:.8rem;margin-top:12px">Days 1-3 free • Full access $67</p>
+</div>
+<div class="grid-3" style="margin-bottom:40px">
+<div class="card" style="text-align:center"><div style="font-size:2rem;margin-bottom:8px">📚</div><div style="font-weight:700;color:#e2e8f0">30 Lessons</div><div style="color:#64748b;font-size:.8rem">Bite-sized daily modules</div></div>
+<div class="card" style="text-align:center"><div style="font-size:2rem;margin-bottom:8px">🎯</div><div style="font-weight:700;color:#e2e8f0">100+ Questions</div><div style="color:#64748b;font-size:.8rem">With explanations & hints</div></div>
+<div class="card" style="text-align:center"><div style="font-size:2rem;margin-bottom:8px">📱</div><div style="font-weight:700;color:#e2e8f0">Works Offline</div><div style="color:#64748b;font-size:.8rem">Single HTML file, no login</div></div>
+</div>
+<div class="glass" style="padding:24px;margin-bottom:24px">
+<h3 style="font-weight:800;margin-bottom:12px;color:#e2e8f0">What's Covered</h3>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:.9rem;color:#94a3b8">
+<div>✓ People Domain (42%)</div><div>✓ Conflict & Leadership</div>
+<div>✓ Process Domain (50%)</div><div>✓ EVM & Critical Path</div>
+<div>✓ Business Environment (8%)</div><div>✓ Agile & Hybrid</div>
+<div>✓ Ethics & PMI Code</div><div>✓ Mock Exam + Strategy</div>
+</div></div>
+<div class="glass" style="padding:24px;text-align:center;margin-bottom:40px">
+<div style="font-size:.8rem;color:#64748b;text-transform:uppercase;letter-spacing:.1em;margin-bottom:4px">One-Time Payment</div>
+<div style="font-size:3rem;font-weight:900" class="text-gradient">$67</div>
+<div style="color:#94a3b8;font-size:.9rem;margin-bottom:16px">Lifetime access • No subscription • Instant download</div>
+<a href="https://dubhajarventures.gumroad.com/l/pmp-master" target="_blank" class="btn btn-success btn-block" style="text-decoration:none;max-width:320px;margin:0 auto">🔓 Unlock All 30 Days</a>
+<div style="color:#475569;font-size:.75rem;margin-top:10px">30-day money-back guarantee</div>
+</div>
+<div style="text-align:center;padding:20px 0 40px;color:#334155;font-size:.75rem">PMP Master Training by Dub Hajar Ventures © ${new Date().getFullYear()}</div>
+</div>`;
+}
+
+function renderLesson(){
+const d=C[S.currentDay];if(!d)return'<p>Day not found</p>';
+const done=S.completedDays.includes(S.currentDay);
+const locked=!S.unlocked&&!FREE_DAYS.includes(S.currentDay);
+return `<div class="container fade-up">
+<div class="glass-strong" style="padding:24px;margin-bottom:20px">
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:12px">
+<div><h1 style="font-size:1.5rem;font-weight:900" class="text-gradient">PMP Master Training</h1><p style="color:#64748b;font-size:.8rem">Progress auto-saves locally</p></div>
+<div style="text-align:right"><div style="font-size:1.5rem;font-weight:900;color:#a78bfa">${S.completedDays.length}/30</div><div style="font-size:.7rem;color:#64748b;text-transform:uppercase">COMPLETE</div></div>
+</div>
+<div class="progress-bar"><div class="progress-fill" style="width:${(S.completedDays.length/30)*100}%"></div></div>
+<div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap">
+<button class="btn btn-ghost" onclick="S.view='landing';render()" style="padding:8px 16px;font-size:.8rem">← Home</button>
+<button class="btn btn-ghost" onclick="exportData()" style="padding:8px 16px;font-size:.8rem">💾 Export</button>
+<button class="btn btn-ghost" onclick="resetData()" style="padding:8px 16px;font-size:.8rem">🔄 Reset</button>
+${S.completedDays.length===30?'<button class="btn btn-success" onclick="showCert()" style="padding:8px 16px;font-size:.8rem">🏆 Certificate</button>':''}
+</div></div>
+
+<div style="background:linear-gradient(135deg,#4f46e5,#7c3aed);border-radius:20px;padding:24px;margin-bottom:20px;position:relative;overflow:hidden">
+<div style="position:absolute;top:-30px;right:-30px;width:120px;height:120px;background:rgba(255,255,255,.08);border-radius:50%"></div>
+<div style="display:flex;justify-content:space-between;align-items:start;flex-wrap:wrap;gap:12px">
+<div><div class="badge badge-amber" style="margin-bottom:8px">DAY ${S.currentDay}</div>
+<h2 style="font-size:1.5rem;font-weight:900;color:#fff;margin-bottom:6px">${d.title}</h2>
+<div style="font-size:.85rem;color:rgba(255,255,255,.7)">${d.domain} • ${d.weight} • +${d.xp} XP</div></div>
+${done?'<div class="badge badge-green" style="font-size:.9rem;padding:10px 20px">✓ PASSED</div>':''}
+</div></div>
+
+${locked?`<div class="locked-overlay" onclick="window.open('https://dubhajarventures.gumroad.com/l/pmp-master','_blank')"><div class="lesson-box" style="min-height:300px;filter:blur(3px)">${d.lesson}</div></div>
+`:`<div class="lesson-box" style="margin-bottom:20px">${d.lesson}</div>
+<button class="btn btn-primary btn-block" onclick="startQuiz()" style="margin-bottom:20px">🎯 Take Quiz (${d.quiz.length} Questions)</button>`}
+
+<div class="glass" style="padding:20px;margin-bottom:20px">
+<h3 style="font-weight:700;margin-bottom:12px;font-size:.95rem;color:#e2e8f0">📅 All Modules</h3>
+<div style="display:grid;grid-template-columns:repeat(6,1fr);gap:8px">
+${[...Array(30)].map((_,i)=>{const day=i+1;const isDone=S.completedDays.includes(day);const isCurr=day===S.currentDay;
+const isLocked=!S.unlocked&&!FREE_DAYS.includes(day);
+const cls=isDone?'day-done':isCurr?'day-current':isLocked?'day-locked':'day-open';
+return `<button class="day-btn ${cls}" onclick="${isLocked?`window.open('https://dubhajarventures.gumroad.com/l/pmp-master','_blank')`:`goDay(${day})`}">${isDone?'✓':isLocked?'🔒':day}</button>`;}).join('')}
+</div></div>
+</div>`;
+}
+
+function renderQuiz(){
+const d=C[S.currentDay];const q=d.quiz[Q.q];
+return `<div class="container fade-up">
+<div class="glass" style="padding:20px;margin-bottom:20px">
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+<div style="font-size:.9rem;color:#94a3b8;font-weight:600">Day ${S.currentDay} • Question ${Q.q+1}/${d.quiz.length}</div>
+<button class="btn btn-ghost" onclick="S.view='lesson';render()" style="padding:6px 14px;font-size:.75rem">← Back</button>
+</div>
+<div class="progress-bar"><div class="progress-fill" style="width:${((Q.q+1)/d.quiz.length)*100}%"></div></div>
+</div>
+<div class="glass-strong" style="padding:28px;margin-bottom:20px">
+<h3 style="font-size:1.1rem;font-weight:700;color:#e2e8f0;margin-bottom:20px;line-height:1.5">${q.q}</h3>
+<div>${q.opts.map((opt,i)=>{let cls='quiz-opt';if(!Q.show){if(Q.ans===i)cls+=' selected'}else{if(i===q.ans)cls+=' correct';else if(Q.ans===i)cls+=' wrong'}
+return `<button class="${cls}" onclick="${Q.show?'':`selAns(${i})`}" ${Q.show?'disabled':''}>${String.fromCharCode(65+i)}. ${opt}</button>`}).join('')}</div>
+${Q.show?`<div style="margin-top:16px;padding:16px;border-radius:12px;background:${Q.ans===q.ans?'rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.3)':'rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3)'}">
+<div style="font-weight:700;font-size:.9rem;margin-bottom:6px;color:${Q.ans===q.ans?'#6ee7b7':'#fca5a5'}">${Q.ans===q.ans?'✅ Correct!':'❌ Incorrect'}</div>
+<p style="font-size:.9rem;color:#cbd5e1;line-height:1.5">${q.exp}</p></div>`:''}
+${!Q.show&&Q.ans!==null?`<div style="text-align:center;margin-top:8px"><button style="background:none;border:none;color:#6366f1;cursor:pointer;font-size:.8rem;font-weight:600" onclick="alert('💡 '+C[S.currentDay].quiz[Q.q].hint)">💡 Need a hint?</button></div>`:''}
+</div>
+${!Q.show?`<button class="btn btn-primary btn-block" onclick="submitAns()" ${Q.ans===null?'disabled style="opacity:.5"':''}>Submit Answer</button>`
+:`<button class="btn btn-success btn-block" onclick="nextQ()">${Q.q<d.quiz.length-1?'Next Question →':'Complete Day '+S.currentDay+' →'}</button>`}
+</div>`;
+}
+
+function renderSummary(){
+const d=C[S.currentDay];const scores=S.scores[S.currentDay]||[];
+const correct=scores.filter(s=>s).length;const pct=Math.round((correct/d.quiz.length)*100);const passed=pct>=70;
+return `<div class="container fade-up" style="text-align:center;padding-top:60px">
+<div class="glass-strong" style="padding:40px;margin-bottom:24px">
+<div style="font-size:4rem;margin-bottom:16px">${passed?'🎉':'📖'}</div>
+<h2 style="font-size:2rem;font-weight:900;color:#e2e8f0;margin-bottom:8px">Day ${S.currentDay} ${passed?'Complete!':'Review Needed'}</h2>
+<div style="font-size:3rem;font-weight:900;margin:16px 0" class="${passed?'text-gradient':'text-gradient-warm'}">${pct}%</div>
+<p style="color:#94a3b8;margin-bottom:8px">${correct}/${d.quiz.length} Correct</p>
+${passed?`<div class="badge badge-green" style="font-size:1rem;padding:10px 24px">✅ PASSED — +${d.xp} XP earned!</div>`
+:`<div class="badge badge-amber" style="font-size:.9rem;padding:10px 24px">Need 70% to pass. Review and retry!</div>`}
+</div>
+<div style="display:flex;gap:12px;flex-wrap:wrap">
+<button class="btn btn-ghost" onclick="S.view='lesson';render()" style="flex:1;min-width:140px">📖 Review Lesson</button>
+<button class="btn btn-primary" onclick="${S.currentDay<30?'goDay('+(S.currentDay+1)+')':'showCert()'}" style="flex:1;min-width:140px">${S.currentDay<30?'Day '+(S.currentDay+1)+' →':'🏆 Certificate'}</button>
+</div></div>`;
+}
+
+function renderCert(){
+return `<div class="container fade-up" style="padding-top:40px">
+<div class="cert-border">
+<div style="font-size:.8rem;color:#64748b;text-transform:uppercase;letter-spacing:.2em;margin-bottom:16px">Certificate of Completion</div>
+<h1 style="font-size:2rem;font-weight:900;margin-bottom:8px" class="text-gradient">PMP Master Training</h1>
+<div style="font-size:1rem;color:#94a3b8;margin-bottom:24px">30-Day Exam Prep System</div>
+<div style="font-size:1.2rem;color:#e2e8f0;font-weight:700;margin-bottom:8px">${S.name||'[Your Name]'}</div>
+<div style="color:#64748b;font-size:.9rem;margin-bottom:24px">Has successfully completed all 30 modules<br>with ${S.completedDays.length} days passed and ${S.xp} XP earned</div>
+<div style="color:#475569;font-size:.8rem">Issued: ${new Date().toLocaleDateString()}</div>
+<div style="color:#475569;font-size:.8rem;margin-top:4px">PMP Master Training by Dub Hajar Ventures</div>
+</div>
+<div style="display:flex;gap:12px;margin-top:24px;flex-wrap:wrap">
+${!S.name?`<input placeholder="Enter your name" style="flex:1;padding:14px 20px;border-radius:50px;border:2px solid rgba(255,255,255,.15);background:rgba(255,255,255,.05);color:#e2e8f0;font-size:1rem" id="certName">
+<button class="btn btn-primary" onclick="S.name=document.getElementById('certName').value;save();render()">Set Name</button>`
+:`<button class="btn btn-primary" onclick="window.print()" style="flex:1">🖨️ Print Certificate</button>
+<button class="btn btn-ghost" onclick="S.view='lesson';render()" style="flex:1">← Back to Course</button>`}
+</div></div>`;
+}
+
+// ═══════════════════════ ACTIONS ═══════════════════════
+function showCert(){S.view='cert';save();render()}
+function goDay(d){S.currentDay=d;S.view='lesson';save();render()}
+function startQuiz(){S.view='quiz';Q={q:0,ans:null,show:false};render()}
+function selAns(i){Q.ans=i;render()}
+function submitAns(){Q.show=true;const d=C[S.currentDay];if(!S.scores[S.currentDay])S.scores[S.currentDay]=[];S.scores[S.currentDay][Q.q]=Q.ans===d.quiz[Q.q].ans;save();render()}
+function nextQ(){const d=C[S.currentDay];if(Q.q<d.quiz.length-1){Q.q++;Q.ans=null;Q.show=false;render()}else{const scores=S.scores[S.currentDay];const pct=(scores.filter(s=>s).length/d.quiz.length)*100;if(pct>=70&&!S.completedDays.includes(S.currentDay)){S.completedDays.push(S.currentDay);S.xp+=d.xp}S.view='summary';save();render()}}
+function exportData(){const b=new Blob([JSON.stringify(S,null,2)],{type:'application/json'});const u=URL.createObjectURL(b);const a=document.createElement('a');a.href=u;a.download=`pmp-backup-${new Date().toISOString().split('T')[0]}.json`;a.click()}
+function resetData(){if(confirm('Reset ALL progress? Cannot be undone!')){localStorage.removeItem('pmpMaster');location.reload()}}
+
+render();
+</script>
+</body>
+</html>
